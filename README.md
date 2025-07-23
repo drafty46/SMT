@@ -11,9 +11,9 @@ Shifting can either be done with the game's ui shifter and keybinds to shift up/
 
 ## Usage
 
-The mod's menu, where all configuration is done, is bound to the home key by default.   \
+The mod's menu, where all configuration is done, is bound to the home key by default.
 
-![alt text](image.png)  \
+![alt text](image.png) 
 
 To change a keybind left click on it's blue box, press the desired key/keys and then right click on the box to confirm. \
 To clear an already set keybind right click on it's box. \
