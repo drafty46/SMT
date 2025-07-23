@@ -33,7 +33,6 @@ bool Vehicle::ShiftToGear(std::int32_t targetGear, float powerCoef) {
 }
 
 bool Vehicle::ShiftToNextGear() {
-	IsInAuto[this] = true;
 	std::int32_t gear = TruckAction->Gear_1 + 1;
 
 	if (gear == 0 && iniConfig["OPTIONS"]["SKIP NEUTRAL"].as<bool>()) {
@@ -44,7 +43,6 @@ bool Vehicle::ShiftToNextGear() {
 }
 
 bool Vehicle::ShiftToPrevGear() {
-	IsInAuto[this] = true;
 	std::int32_t gear = TruckAction->Gear_1 - 1;
 
 	if (gear == 0 && iniConfig["OPTIONS"]["SKIP NEUTRAL"].as<bool>()) {
