@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>17.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{a7c65450-6afc-43ac-a264-c2e3cdf1d568}</ProjectGuid>
+    <RootNamespace>DLL</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <TargetName>$(SolutionName)</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <TargetName>$(SolutionName)</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <TargetName>$(SolutionName)</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <TargetName>$(SolutionName)</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;DLL_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\kiero;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\imgui\backends;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\detours\include;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\imgui</AdditionalIncludeDirectories>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalLibraryDirectories>D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\detours\lib.X64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>shared.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\ois\includes;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\tsl;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\inifile-cpp\include;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\zydis\include;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\sdl\include;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\sdl3\include\SDL3;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\kiero\minhook\include;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\imgui\backends;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\kiero;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\detours\include;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PreprocessorDefinitions>SDL_STATIC;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Optimization>MaxSpeed</Optimization>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>d3d11.lib;d3dcompiler.lib;dxgi.lib;dxguid.lib;detours.lib;user32.lib;OIS.lib;dinput8.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\ois\lib;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\zydis\lib;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\sdl\lib\x64;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\sdl3\lib\x64;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x64;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\kiero\minhook\lib;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\detours\lib.X64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;DLL_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\kiero;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\imgui\backends;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\detours\include;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\imgui</AdditionalIncludeDirectories>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalLibraryDirectories>D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\detours\lib.X64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>shared.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <AdditionalIncludeDirectories>D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\ois\includes;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\tsl;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\inifile-cpp\include;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\zydis\include;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\sdl\include;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\sdl3\include\SDL3;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\kiero\minhook\include;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\imgui\backends;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\kiero;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\detours\include;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PreprocessorDefinitions>SDL_STATIC;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Optimization>MaxSpeed</Optimization>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>d3d11.lib;d3dcompiler.lib;dxgi.lib;dxguid.lib;detours.lib;user32.lib;OIS.lib;dinput8.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\ois\lib;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\zydis\lib;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\sdl\lib\x64;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\sdl3\lib\x64;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x64;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\kiero\minhook\lib;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\detours\lib.X64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="config.h" />
+    <ClInclude Include="framework.h" />
+    <ClInclude Include="game_data.h" />
+    <ClInclude Include="gui.h" />
+    <ClInclude Include="imgui\backends\imgui_impl_allegro5.h" />
+    <ClInclude Include="imgui\backends\imgui_impl_android.h" />
+    <ClInclude Include="imgui\backends\imgui_impl_dx10.h" />
+    <ClInclude Include="imgui\backends\imgui_impl_dx11.h" />
+    <ClInclude Include="imgui\backends\imgui_impl_dx12.h" />
+    <ClInclude Include="imgui\backends\imgui_impl_dx9.h" />
+    <ClInclude Include="imgui\backends\imgui_impl_glfw.h" />
+    <ClInclude Include="imgui\backends\imgui_impl_glut.h" />
+    <ClInclude Include="imgui\backends\imgui_impl_metal.h" />
+    <ClInclude Include="imgui\backends\imgui_impl_opengl2.h" />
+    <ClInclude Include="imgui\backends\imgui_impl_opengl3.h" />
+    <ClInclude Include="imgui\backends\imgui_impl_opengl3_loader.h" />
+    <ClInclude Include="imgui\backends\imgui_impl_osx.h" />
+    <ClInclude Include="imgui\backends\imgui_impl_sdl2.h" />
+    <ClInclude Include="imgui\backends\imgui_impl_sdl3.h" />
+    <ClInclude Include="imgui\backends\imgui_impl_sdlgpu3.h" />
+    <ClInclude Include="imgui\backends\imgui_impl_sdlgpu3_shaders.h" />
+    <ClInclude Include="imgui\backends\imgui_impl_sdlrenderer2.h" />
+    <ClInclude Include="imgui\backends\imgui_impl_sdlrenderer3.h" />
+    <ClInclude Include="imgui\backends\imgui_impl_vulkan.h" />
+    <ClInclude Include="imgui\backends\imgui_impl_wgpu.h" />
+    <ClInclude Include="imgui\backends\imgui_impl_win32.h" />
+    <ClInclude Include="imgui\examples\example_allegro5\imconfig_allegro5.h" />
+    <ClInclude Include="imgui\examples\libs\emscripten\emscripten_mainloop_stub.h" />
+    <ClInclude Include="imgui\examples\libs\glfw\include\GLFW\glfw3.h" />
+    <ClInclude Include="imgui\examples\libs\glfw\include\GLFW\glfw3native.h" />
+    <ClInclude Include="imgui\imconfig.h" />
+    <ClInclude Include="imgui\imgui.h" />
+    <ClInclude Include="imgui\imgui_internal.h" />
+    <ClInclude Include="imgui\imstb_rectpack.h" />
+    <ClInclude Include="imgui\imstb_textedit.h" />
+    <ClInclude Include="imgui\imstb_truetype.h" />
+    <ClInclude Include="imgui\misc\cpp\imgui_stdlib.h" />
+    <ClInclude Include="imgui\misc\freetype\imgui_freetype.h" />
+    <ClInclude Include="imgui\misc\single_file\imgui_single_file.h" />
+    <ClInclude Include="inifile-cpp\include\inicpp.h" />
+    <ClInclude Include="input.h" />
+    <ClInclude Include="kiero\kiero.h" />
+    <ClInclude Include="memory.h" />
+    <ClInclude Include="shared.h" />
+    <ClInclude Include="tsl\ordered_hash.h" />
+    <ClInclude Include="tsl\ordered_map.h" />
+    <ClInclude Include="tsl\ordered_set.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="config.cpp" />
+    <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="game_data.cpp" />
+    <ClCompile Include="gui.cpp" />
+    <ClCompile Include="imgui\backends\imgui_impl_dx11.cpp" />
+    <ClCompile Include="imgui\backends\imgui_impl_win32.cpp" />
+    <ClCompile Include="imgui\imgui.cpp" />
+    <ClCompile Include="imgui\imgui_demo.cpp" />
+    <ClCompile Include="imgui\imgui_draw.cpp" />
+    <ClCompile Include="imgui\imgui_tables.cpp" />
+    <ClCompile Include="imgui\imgui_widgets.cpp" />
+    <ClCompile Include="input.cpp" />
+    <ClCompile Include="kiero\kiero.cpp" />
+    <ClCompile Include="memory.cpp" />
+    <ClCompile Include="pch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
