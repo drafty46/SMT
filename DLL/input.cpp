@@ -3,6 +3,7 @@
 #include "config.h"
 #include "gui.h"
 #include "game_data.h"
+#include "memory.h"
 
 extern std::unordered_map <Vehicle*, std::atomic<bool>> IsInAuto;
 
@@ -34,8 +35,8 @@ std::unordered_map<std::string, std::function<void()>> bindFunctions = {
 	{ "GEAR L+",[]() {if (auto veh = GetCurrentVehicle()) veh->ShiftToLowPlusGear(); }},
 	{ "GEAR N",[]() {if (auto veh = GetCurrentVehicle()) veh->ShiftToGear(0); }},
 	{ "GEAR R",[]() {if (auto veh = GetCurrentVehicle()) veh->ShiftToReverseGear(); }},
-	{ "GEAR UP",[]() {if (auto veh = GetCurrentVehicle()) veh->ShiftToNextGear(); }},
-	{ "GEAR DOWN",[]() {if (auto veh = GetCurrentVehicle()) veh->ShiftToPrevGear(); }},
+	{ "GEAR UP",[]() { if (auto veh = GetCurrentVehicle()) veh->ShiftToNextGear(); }},
+	{ "GEAR DOWN",[]() { if (auto veh = GetCurrentVehicle()) veh->ShiftToPrevGear(); }},
 	{ "CLUTCH",[]() { return; } },
 	{ "SHOW MENU",[]() {showGui = !showGui; } }
 };
@@ -126,101 +127,104 @@ DWORD WINAPI ProcessInput(LPVOID lpReserved) {
 	LogMessage("Processing input");
 	do {
 		auto nextFrameTime = std::chrono::steady_clock::now();
-		std::set<std::string> functionsToRun;
-		int32_t keyCount = 0;
-		keyboard->capture();
 		if (GetForegroundWindow() == window) {
-			for (auto& js : joystickList) {
-				js->capture();
-			}
-		}
-		for (auto action : iniConfig["KEYBOARD"]) {
-			bool pressed = true;
-			if (action.second.as<std::string>() == "LISTENING") {
-				for (auto key : currentlyPressed) {
-					if (key.second && std::find(tempPressed.begin(), tempPressed.end(), key.first) == tempPressed.end()) {
-						tempPressed.push_back(key.first);
-					}
+			std::set<std::string> functionsToRun;
+			int32_t keyCount = 0;
+			keyboard->capture();
+			if (GetForegroundWindow() == window) {
+				for (auto& js : joystickList) {
+					js->capture();
 				}
 			}
-			else if (action.second.as<std::string>() == "FOUND") {
-				if (tempPressed.size() > 0) {
-					std::string tempStr = "";
-					std::sort(tempPressed.begin(), tempPressed.end());
-					for (auto key : tempPressed) {
-						tempStr += key;
-						tempStr += "+";
+			for (auto action : iniConfig["KEYBOARD"]) {
+				bool pressed = true;
+				if (action.second.as<std::string>() == "LISTENING") {
+					for (auto key : currentlyPressed) {
+						if (key.second && std::find(tempPressed.begin(), tempPressed.end(), key.first) == tempPressed.end()) {
+							tempPressed.push_back(key.first);
+						}
 					}
-					tempStr.pop_back();
-					iniConfig["KEYBOARD"][action.first] = tempStr;
+				}
+				else if (action.second.as<std::string>() == "FOUND") {
+					if (tempPressed.size() > 0) {
+						std::string tempStr = "";
+						std::sort(tempPressed.begin(), tempPressed.end());
+						for (auto key : tempPressed) {
+							tempStr += key;
+							tempStr += "+";
+						}
+						tempStr.pop_back();
+						iniConfig["KEYBOARD"][action.first] = tempStr;
+					}
+					else {
+						iniConfig["KEYBOARD"][action.first] = "NONE";
+					}
+					tempPressed.clear();
 				}
 				else {
-					iniConfig["KEYBOARD"][action.first] = "NONE";
-				}
-				tempPressed.clear();
-			}
-			else {
-				int32_t cnt = 0;
-				for (auto part : action.second.as<std::string>() | std::views::split('+')) {
-					cnt++;
-					if (!currentlyPressed[std::string(part.begin(), part.end())]) {
-						pressed = false;
-						break;
+					int32_t cnt = 0;
+					for (auto part : action.second.as<std::string>() | std::views::split('+')) {
+						cnt++;
+						if (!currentlyPressed[std::string(part.begin(), part.end())]) {
+							pressed = false;
+							break;
+						}
+					}
+					if (pressed && wasPressedKb[action.first] == false) {
+						if (cnt > keyCount) { functionsToRun.clear(); }
+						functionsToRun.emplace(action.first);
 					}
 				}
-				if (pressed && wasPressedKb[action.first] == false) {
-					if (cnt > keyCount) { functionsToRun.clear(); }
-					functionsToRun.emplace(action.first);
-				}
+				wasPressedKb[action.first] = pressed;
 			}
-			wasPressedKb[action.first] = pressed;
-		}
-		for (auto action : iniConfig["CONTROLLER"]) {
-			bool pressed = true;
-			if (action.second.as<std::string>() == "LISTENING") {
-				for (auto key : currentlyPressed) {
-					if (key.second && std::find(tempPressed.begin(), tempPressed.end(), key.first) == tempPressed.end()) {
-						tempPressed.push_back(key.first);
+			for (auto action : iniConfig["CONTROLLER"]) {
+				bool pressed = true;
+				if (action.second.as<std::string>() == "LISTENING") {
+					for (auto key : currentlyPressed) {
+						if (key.second && std::find(tempPressed.begin(), tempPressed.end(), key.first) == tempPressed.end()) {
+							tempPressed.push_back(key.first);
+						}
 					}
 				}
-			}
-			else if (action.second.as<std::string>() == "FOUND") {
-				if (tempPressed.size() > 0) {
-					std::string tempStr = "";
-					std::sort(tempPressed.begin(), tempPressed.end());
-					for (auto key : tempPressed) {
-						tempStr += key;
-						tempStr += "+";
+				else if (action.second.as<std::string>() == "FOUND") {
+					if (tempPressed.size() > 0) {
+						std::string tempStr = "";
+						std::sort(tempPressed.begin(), tempPressed.end());
+						for (auto key : tempPressed) {
+							tempStr += key;
+							tempStr += "+";
+						}
+						tempStr.pop_back();
+						iniConfig["CONTROLLER"][action.first] = tempStr;
 					}
-					tempStr.pop_back();
-					iniConfig["CONTROLLER"][action.first] = tempStr;
+					else {
+						iniConfig["CONTROLLER"][action.first] = "NONE";
+					}
+					tempPressed.clear();
 				}
 				else {
-					iniConfig["CONTROLLER"][action.first] = "NONE";
-				}
-				tempPressed.clear();
-			}
-			else {
-				int32_t cnt = 0;
-				for (auto part : action.second.as<std::string>() | std::views::split('+')) {
-					cnt++;
-					if (!currentlyPressed[std::string(part.begin(), part.end())]) {
-						pressed = false;
-						break;
+					int32_t cnt = 0;
+					for (auto part : action.second.as<std::string>() | std::views::split('+')) {
+						cnt++;
+						if (!currentlyPressed[std::string(part.begin(), part.end())]) {
+							pressed = false;
+							break;
+						}
+					}
+					if (pressed && wasPressedJoy[action.first] == false) {
+						if (cnt > keyCount) { functionsToRun.clear(); }
+						functionsToRun.emplace(action.first);
 					}
 				}
-				if (pressed && wasPressedJoy[action.first] == false) {
-					if (cnt > keyCount) { functionsToRun.clear(); }
-					functionsToRun.emplace(action.first);
+				wasPressedJoy[action.first] = pressed;
+			}
+			for (auto fnc : functionsToRun) {
+				if (!iniConfig["OPTIONS"]["REQUIRE CLUTCH"].as<bool>() || wasPressedKb["CLUTCH"] || wasPressedJoy["CLUTCH"] || fnc == "SHOW MENU") {
+					bindFunctions[fnc]();
 				}
 			}
-			wasPressedJoy[action.first] = pressed;
 		}
-		for (auto fnc : functionsToRun) {
-			if (!iniConfig["OPTIONS"]["REQUIRE CLUTCH"].as<bool>() || wasPressedKb["CLUTCH"] || wasPressedJoy["CLUTCH"] || fnc == "SHOW MENU") {
-				bindFunctions[fnc]();
-			}
-		}
+
 		if (GetAsyncKeyState(VK_END) & 0x8000 && GetAsyncKeyState(VK_LCONTROL) & 0x8000 && GetAsyncKeyState(VK_LSHIFT) & 0x8000) {
 			DetachDLL();
 		}

@@ -11,11 +11,11 @@ std::atomic<bool> alive = true;
 void AttachConsole()
 {
 	if (!hasConsole) {
-		AllocConsole(); // Create a new console window
+		AllocConsole();
 		hasConsole = true;
-		freopen_s((FILE**)stdout, "CONOUT$", "w", stdout);  // Redirect stdout
-		freopen_s((FILE**)stderr, "CONOUT$", "w", stderr);  // Redirect stderr
-		freopen_s((FILE**)stdin, "CONIN$", "r", stdin);   // Optional: stdin
+		freopen_s((FILE**)stdout, "CONOUT$", "w", stdout);
+		freopen_s((FILE**)stderr, "CONOUT$", "w", stderr);
+		freopen_s((FILE**)stdin, "CONIN$", "r", stdin);
 		SetConsoleTitleA("Logging Console");
 
 		std::cout.clear();

@@ -54,7 +54,6 @@ inline void LogMessage(const T& msg) {
 template<typename T, typename... Args>
 inline void LogMessage(const T& first, const Args&... rest) {
 	std::cout << currentTime() << ' ' << first;
-	// Using a fold-like trick to print rest with spaces
 	using expander = int[];
 	(void)expander {
 		0, (std::cout << ' ' << rest, 0)...

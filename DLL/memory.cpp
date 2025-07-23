@@ -1,6 +1,7 @@
 #include "shared.h"
 #include "memory.h"
 #include "config.h"
+#include "game_data.h"
 
 HMODULE hModule = GetModuleHandleA(NULL);
 MODULEINFO mInfo;
@@ -96,7 +97,7 @@ int32_t DigAHole(uintptr_t result) {
 	return value;
 }
 
-combine_TRUCK_CONTROL* TruckControlPtr = nullptr;
+combine_TRUCK_CONTROL** TruckControlPtr = nullptr;
 Fnc_ShiftGear* ShiftGearO = nullptr;
 Fnc_ShiftToAutoGear* ShiftToAutoGearO = nullptr;
 Fnc_ShiftToHigh* ShiftToHighO = nullptr;
@@ -106,6 +107,14 @@ Fnc_GetMaxGear* GetMaxGearO = nullptr;
 Fnc_DisableAutoAndShift* DisableAutoAndShiftO = nullptr;
 Fnc_SetPowerCoef* SetPowerCoefO = nullptr;
 Fnc_SetCurrentVehicle* SetCurrentVehicleO = nullptr;
+
+Vehicle* GetCurrentVehicle() {
+	combine_TRUCK_CONTROL* truckCtrl = *TruckControlPtr;
+	if (truckCtrl == nullptr) {
+		return nullptr;
+	}
+	return truckCtrl->CurVehicle;
+}
 
 void InitMemory() {
 	int32_t ShiftGearOffset = PatternScan("48 89 74 24 10 48 89 7C 24 18 41 56 48 83 EC 20 48 8B 81 60 01 00 00 48 8B F1 48 B9 FF FF FF FF FF FF 00 FF 8B FA 48 23 C1");
@@ -130,7 +139,7 @@ void InitMemory() {
 	int32_t combine_TRUCK_CONTROLOffset = DigAHole(PatternScan("40 53 48 83 EC 20 48 8B D9 E8 ? ? ? ? 33 C9 48 89 18"));
 	LogMessage("combine_TRUCK_CONTROL:", std::format("{:08x}", (combine_TRUCK_CONTROLOffset)));
 
-	TruckControlPtr = *(combine_TRUCK_CONTROL**)(base + combine_TRUCK_CONTROLOffset);
+	TruckControlPtr = (combine_TRUCK_CONTROL**)(base + combine_TRUCK_CONTROLOffset);
 	ShiftGearO = (Fnc_ShiftGear*)(base + ShiftGearOffset);
 	ShiftToAutoGearO = (Fnc_ShiftToAutoGear*)(base + ShiftToAutoGearOffset);
 	ShiftToHighO = (Fnc_ShiftToHigh*)(base + ShiftToHighOffset);
@@ -140,6 +149,9 @@ void InitMemory() {
 	DisableAutoAndShiftO = (Fnc_DisableAutoAndShift*)(base + DisableAutoAndShiftOffset);
 	SetPowerCoefO = (Fnc_SetPowerCoef*)(base + SetPowerCoefOffset);
 	SetCurrentVehicleO = (Fnc_SetCurrentVehicle*)(base + SetCurrentVehicleOffset);
+
+	DetourRestoreAfterWith();
+
 	DetourTransactionBegin();
 	DetourUpdateThread(GetCurrentThread());
 	DetourAttach((PVOID*)&ShiftGearO, (PVOID)Hooked_ShiftGear);
@@ -160,6 +172,8 @@ void InitMemory() {
 		veh->TruckAction->IsInAutoMode = false;
 		veh->ShiftToGear(1, 1.01);
 	}
+
+	LogMessage("init", ShiftGearO);
 }
 
 void ShutdownMemory() {

@@ -45,7 +45,7 @@ bool Vehicle::ShiftToNextGear() {
 
 bool Vehicle::ShiftToPrevGear() {
 	IsInAuto[this] = true;
-	auto gear = static_cast<std::int32_t>(TruckAction->Gear_1) - 1;
+	std::int32_t gear = TruckAction->Gear_1 - 1;
 
 	if (gear == 0 && iniConfig["OPTIONS"]["SKIP NEUTRAL"].as<bool>()) {
 		gear = -1;
@@ -87,7 +87,8 @@ bool Vehicle::ShiftToLowMinusGear() {
 }
 
 bool Hooked_ShiftGear(Vehicle* veh, std::int32_t gear) {
-	return ShiftGearO(veh, gear);
+	bool result = ShiftGearO(veh, gear);
+	return result;
 }
 
 std::int32_t Hooked_GetMaxGear(const Vehicle* veh) {
@@ -167,13 +168,4 @@ void Hooked_SetCurrentVehicle(combine_TRUCK_CONTROL* truckCtrl, Vehicle* veh) {
 		veh->TruckAction->IsInAutoMode = false;
 	}
 	SetCurrentVehicleO(truckCtrl, veh);
-}
-
-Vehicle* GetCurrentVehicle() {
-	combine_TRUCK_CONTROL* truckCtrl = TruckControlPtr;
-
-	if (truckCtrl == nullptr) {
-		return nullptr;
-	}
-	return truckCtrl->CurVehicle;
 }

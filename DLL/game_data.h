@@ -1,6 +1,5 @@
 #pragma once
 #include "shared.h"
-#include "memory.h"
 
 inline const float PowerCoefLowGear = .45f;
 inline const float PowerCoefLowPlusGear = 1.f;
@@ -220,5 +219,4 @@ public:
 	char pad_0000[1032]; // 0x0000
 };                     // Size: 0x0408
 
-extern Vehicle* GetCurrentVehicle();
 extern std::unordered_map <Vehicle*, std::atomic<bool>> IsInAuto;
