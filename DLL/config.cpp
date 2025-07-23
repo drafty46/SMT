@@ -27,7 +27,7 @@ ini::IniFile WriteDefaultIniConfig() {
 	defaultIniConfig["KEYBOARD"]["GEAR UP"] = "NONE";
 	defaultIniConfig["KEYBOARD"]["GEAR DOWN"] = "NONE";
 	defaultIniConfig["KEYBOARD"]["CLUTCH"] = "NONE";
-	defaultIniConfig["KEYBOARD"]["SHOW MENU"] = "NONE";
+	defaultIniConfig["KEYBOARD"]["SHOW MENU"] = "Win32InputManager.k.199";
 
 	defaultIniConfig["CONTROLLER"]["GEAR 1"] = "NONE";
 	defaultIniConfig["CONTROLLER"]["GEAR 2"] = "NONE";

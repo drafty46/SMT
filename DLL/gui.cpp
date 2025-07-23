@@ -136,7 +136,7 @@ HRESULT __stdcall hookedPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, U
 
 	if (showGui) {
 		int32_t count = 0;
-		ImGui::Begin("SnowRunner Manual Transmission", nullptr,
+		ImGui::Begin("SnowRunner Manual Transmission v1.0", nullptr,
 			ImGuiWindowFlags_NoResize |
 			ImGuiWindowFlags_NoCollapse |
 			ImGuiWindowFlags_NoMove
