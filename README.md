@@ -9,6 +9,9 @@ Shifting can either be done with the game's ui shifter and keybinds to shift up/
 2. Extract files from archive into game folder, next to SnowRunner.exe.
 3. The mod will load on game launch.
 
+#### Use [this subscribe mod](https://mod.io/g/snowrunner/m/manual-text-for-shifter#description) to change the shifter text from AUTO {gear} to GEAR {gear}
+![alt text](image-1.png)
+
 ## Usage
 
 The mod's menu, where all configuration is done, is bound to the home key by default.
