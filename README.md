@@ -16,11 +16,16 @@ Shifting can either be done with the game's ui shifter and keybinds to shift up/
 
 The mod's menu, where all configuration is done, is bound to the home key by default.
 
-![alt text](image.png) 
+![alt text](image.png)
 
 To change a keybind left click on it's blue box, press the desired key/keys and then right click on the box to confirm. \
+**NOTE: For axis that return to one end like pedals you need to confirm before releasing them.**    \
 To clear an already set keybind right click on it's box. \
 Changes take effect immediately but aren't saved unless you use the save button.
+
+**Ranges** - use this if you don't have a physical range toggle. There's LOW, NORMAL and HIGH.  \
+Cycling up/down is done with 'RANGE LOW'/'RANGE HIGH' keybinds. (**Must be a single button**)   \
+When selected, LOW/HIGH simulate their key being pressed, so bind the same button for the range + the actual button to press.
 
 ## Credits
 
@@ -33,3 +38,4 @@ Changes take effect immediately but aren't saved unless you use the save button.
 ### [rdbo](https://github.com/rdbo) for [ImGui-DirectX-11-Kiero-Hook](https://github.com/rdbo/ImGui-DirectX-11-Kiero-Hook) - Imgui+kiero integration
 ### [wgois](https://github.com/wgois) for [OIS](https://github.com/wgois/OIS) - library
 ### [Tessil](https://github.com/Tessil) for [ordered-map](https://github.com/Tessil/ordered-map) - library
+### [nothings](https://github.com/nothings) for [stb](https://github.com/nothings/stb) - library

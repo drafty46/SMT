@@ -46,8 +46,8 @@ DWORD WINAPI MainThread(LPVOID lpReserved)
 {
 	//AttachConsole();
 	LoadIniConfig();
-	InitGui();
 	InitMemory();
+	InitGui();
 	while (!isGuiInitialized) { Sleep(100); }
 	InitInput();
 	return TRUE;
@@ -64,8 +64,9 @@ BOOL WINAPI DllMain(HMODULE hMod, DWORD dwReason, LPVOID lpReserved)
 		break;
 	case DLL_PROCESS_DETACH:
 		//SaveIniConfig();
-		ShutdownMemory();
 		ShutdownInput();
+		do { Sleep(100); } while (keepAliveInput);
+		ShutdownMemory();
 		ShutdownGui();
 		DetachConsole();
 		break;

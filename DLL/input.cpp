@@ -8,13 +8,14 @@
 extern std::unordered_map <Vehicle*, std::atomic<bool>> IsInAuto;
 
 OIS::InputManager* inputManager;
-std::atomic<bool> keepAlive = true;
+std::atomic<bool> keepAliveInput = true;
 OIS::Keyboard* keyboard = nullptr;
 std::vector<OIS::JoyStick*> joystickList;
 std::unordered_map<std::string, bool> currentlyPressed;
-std::vector<std::string> tempPressed;
+std::set<std::string> tempPressed;
 std::unordered_map<std::string, bool> wasPressedKb;
 std::unordered_map<std::string, bool> wasPressedJoy;
+std::atomic<int32_t> range = 0;
 
 std::unordered_map<std::string, std::function<void()>> bindFunctions = {
 	{ "GEAR 1",[]() { if (auto veh = GetCurrentVehicle()) { IsInAuto[veh] = true; veh->ShiftToGear(1); } }},
@@ -38,86 +39,168 @@ std::unordered_map<std::string, std::function<void()>> bindFunctions = {
 	{ "GEAR UP",[]() { if (auto veh = GetCurrentVehicle()) veh->ShiftToNextGear(); }},
 	{ "GEAR DOWN",[]() { if (auto veh = GetCurrentVehicle()) veh->ShiftToPrevGear(); }},
 	{ "CLUTCH",[]() { return; } },
+	{ "RANGE HIGH",[]() { if (range < 1) range++; }},
+	{ "RANGE LOW",[]() { if (range > -1) range--; }},
 	{ "SHOW MENU",[]() {showGui = !showGui; } }
 };
 
 extern void DetachDLL();
 
+std::string abbreviate(const std::string& input) {
+	std::stringstream ss(input);
+	std::string word;
+	std::string abbreviation;
+
+	while (ss >> word) {
+		if (!word.empty()) {
+			abbreviation += toupper(word[0]);
+		}
+	}
+
+	return abbreviation;
+}
+
 namespace SMT {
 
 	bool KeyListener::keyPressed(const OIS::KeyEvent& e) {
-		currentlyPressed[e.device->vendor() + ".k." + std::to_string(e.key)] = true;
+		std::string entry = "Kb." + std::to_string(e.key);
+		if (!currentlyPressed[entry]) {
+			tempPressed.emplace(entry);
+		}
+		currentlyPressed[entry] = true;
 		return true;
 	}
 
 	bool KeyListener::keyReleased(const OIS::KeyEvent& e) {
-		currentlyPressed[e.device->vendor() + ".k." + std::to_string(e.key)] = false;
+		currentlyPressed["Kb." + std::to_string(e.key)] = false;
 		return true;
 	}
 
 	bool JoyStickListener::buttonPressed(const OIS::JoyStickEvent& e, int button) {
-		currentlyPressed[e.device->vendor() + ".b." + std::to_string(button)] = true;
+		std::string entry = abbreviate(e.device->vendor()) + ".b." + std::to_string(button);
+		if (!currentlyPressed[entry]) {
+			tempPressed.emplace(entry);
+		}
+		currentlyPressed[entry] = true;
 		return true;
 	}
 
 	bool JoyStickListener::buttonReleased(const OIS::JoyStickEvent& e, int button) {
-		currentlyPressed[e.device->vendor() + ".b." + std::to_string(button)] = false;
+		currentlyPressed[abbreviate(e.device->vendor()) + ".b." + std::to_string(button)] = false;
 		return true;
 	}
 
 	bool JoyStickListener::axisMoved(const OIS::JoyStickEvent& e, int axis) {
-		if (e.state.mAxes[axis].abs > 25000) {
-			currentlyPressed[e.device->vendor() + ".a." + std::to_string(axis) + ".p"] = true;
+		if (e.state.mAxes[axis].abs > 20000) {
+			std::string entry = abbreviate(e.device->vendor()) + ".a." + std::to_string(axis) + ".p";
+			if (!currentlyPressed[entry]) {
+				tempPressed.emplace(entry);
+			}
+			currentlyPressed[entry] = true;
 		}
 		else {
-			currentlyPressed[e.device->vendor() + ".a." + std::to_string(axis) + ".p"] = false;
+			currentlyPressed[abbreviate(e.device->vendor()) + ".a." + std::to_string(axis) + ".p"] = false;
 		}
-		if (e.state.mAxes[axis].abs < -25000) {
-			currentlyPressed[e.device->vendor() + ".a." + std::to_string(axis) + ".n"] = true;
+		if (e.state.mAxes[axis].abs < -20000) {
+			std::string entry = abbreviate(e.device->vendor()) + ".a." + std::to_string(axis) + ".n";
+			if (!currentlyPressed[entry]) {
+				tempPressed.emplace(entry);
+			}
+			currentlyPressed[entry] = true;
 		}
 		else {
-			currentlyPressed[e.device->vendor() + ".a." + std::to_string(axis) + ".n"] = false;
+			currentlyPressed[abbreviate(e.device->vendor()) + ".a." + std::to_string(axis) + ".n"] = false;
 		}
 		return true;
 	}
 
 	bool JoyStickListener::sliderMoved(const OIS::JoyStickEvent& e, int sliderID) {
-		if (e.state.mSliders[sliderID].abX) {
-			currentlyPressed[e.device->vendor() + ".s." + std::to_string(sliderID)] = true;
+		if (e.state.mSliders[sliderID].abX > 20000) {
+			std::string entry = abbreviate(e.device->vendor()) + ".s.x." + std::to_string(sliderID) + ".p";
+			if (!currentlyPressed[entry]) {
+				tempPressed.emplace(entry);
+			}
+			currentlyPressed[entry] = true;
 		}
 		else {
-			currentlyPressed[e.device->vendor() + ".s." + std::to_string(sliderID)] = false;
+			currentlyPressed[abbreviate(e.device->vendor()) + ".s.x." + std::to_string(sliderID) + ".p"] = false;
+		}
+		if (e.state.mSliders[sliderID].abX < -20000) {
+			std::string entry = abbreviate(e.device->vendor()) + ".s.x." + std::to_string(sliderID) + ".n";
+			if (!currentlyPressed[entry]) {
+				tempPressed.emplace(entry);
+			}
+			currentlyPressed[entry] = true;
+		}
+		else {
+			currentlyPressed[abbreviate(e.device->vendor()) + ".s.x." + std::to_string(sliderID) + ".n"] = false;
+		}
+		if (e.state.mSliders[sliderID].abY > 20000) {
+			std::string entry = abbreviate(e.device->vendor()) + ".s.y." + std::to_string(sliderID) + ".p";
+			if (!currentlyPressed[entry]) {
+				tempPressed.emplace(entry);
+			}
+			currentlyPressed[entry] = true;
+		}
+		else {
+			currentlyPressed[abbreviate(e.device->vendor()) + ".s.y." + std::to_string(sliderID) + ".p"] = false;
+		}
+		if (e.state.mSliders[sliderID].abY < -20000) {
+			std::string entry = abbreviate(e.device->vendor()) + ".s.y." + std::to_string(sliderID) + ".n";
+			if (!currentlyPressed[entry]) {
+				tempPressed.emplace(entry);
+			}
+			currentlyPressed[entry] = true;
+		}
+		else {
+			currentlyPressed[abbreviate(e.device->vendor()) + ".s.y." + std::to_string(sliderID) + ".n"] = false;
 		}
 		return true;
 	}
 
 	bool JoyStickListener::povMoved(const OIS::JoyStickEvent& e, int pov) {
 		if ((e.state.mPOV[pov].direction & OIS::Pov::North) != 0) {
-			currentlyPressed[e.device->vendor() + ".p." + std::to_string(pov) + ".up"] = true;
+			std::string entry = abbreviate(e.device->vendor()) + ".p." + std::to_string(pov) + ".up";
+			if (!currentlyPressed[entry]) {
+				tempPressed.emplace(entry);
+			}
+			currentlyPressed[entry] = true;
 		}
 		else {
-			currentlyPressed[e.device->vendor() + ".p." + std::to_string(pov) + ".up"] = false;
+			currentlyPressed[abbreviate(e.device->vendor()) + ".p." + std::to_string(pov) + ".up"] = false;
 		}
 
 		if ((e.state.mPOV[pov].direction & OIS::Pov::South) != 0) {
-			currentlyPressed[e.device->vendor() + ".p." + std::to_string(pov) + ".down"] = true;
+			std::string entry = abbreviate(e.device->vendor()) + ".p." + std::to_string(pov) + ".down";
+			if (!currentlyPressed[entry]) {
+				tempPressed.emplace(entry);
+			}
+			currentlyPressed[entry] = true;
 		}
 		else {
-			currentlyPressed[e.device->vendor() + ".p." + std::to_string(pov) + ".down"] = false;
+			currentlyPressed[abbreviate(e.device->vendor()) + ".p." + std::to_string(pov) + ".down"] = false;
 		}
 
 		if ((e.state.mPOV[pov].direction & OIS::Pov::East) != 0) {
-			currentlyPressed[e.device->vendor() + ".p." + std::to_string(pov) + ".right"] = true;
+			std::string entry = abbreviate(e.device->vendor()) + ".p." + std::to_string(pov) + ".right";
+			if (!currentlyPressed[entry]) {
+				tempPressed.emplace(entry);
+			}
+			currentlyPressed[entry] = true;
 		}
 		else {
-			currentlyPressed[e.device->vendor() + ".p." + std::to_string(pov) + ".right"] = false;
+			currentlyPressed[abbreviate(e.device->vendor()) + ".p." + std::to_string(pov) + ".right"] = false;
 		}
 
 		if ((e.state.mPOV[pov].direction & OIS::Pov::West) != 0) {
-			currentlyPressed[e.device->vendor() + ".p." + std::to_string(pov) + ".left"] = true;
+			std::string entry = abbreviate(e.device->vendor()) + ".p." + std::to_string(pov) + ".left";
+			if (!currentlyPressed[entry]) {
+				tempPressed.emplace(entry);
+			}
+			currentlyPressed[entry] = true;
 		}
 		else {
-			currentlyPressed[e.device->vendor() + ".p." + std::to_string(pov) + ".left"] = false;
+			currentlyPressed[abbreviate(e.device->vendor()) + ".p." + std::to_string(pov) + ".left"] = false;
 		}
 		return true;
 	}
@@ -125,7 +208,7 @@ namespace SMT {
 
 DWORD WINAPI ProcessInput(LPVOID lpReserved) {
 	LogMessage("Processing input");
-	do {
+	while (keepAliveInput) {
 		auto nextFrameTime = std::chrono::steady_clock::now();
 		if (GetForegroundWindow() == window) {
 			std::set<std::string> functionsToRun;
@@ -136,19 +219,12 @@ DWORD WINAPI ProcessInput(LPVOID lpReserved) {
 					js->capture();
 				}
 			}
+			bool goToNeutral = iniConfig["OPTIONS"]["REQUIRE GEAR HELD"].as<bool>();
 			for (auto action : iniConfig["KEYBOARD"]) {
 				bool pressed = true;
-				if (action.second.as<std::string>() == "LISTENING") {
-					for (auto key : currentlyPressed) {
-						if (key.second && std::find(tempPressed.begin(), tempPressed.end(), key.first) == tempPressed.end()) {
-							tempPressed.push_back(key.first);
-						}
-					}
-				}
-				else if (action.second.as<std::string>() == "FOUND") {
+				if (action.second.as<std::string>() == "FOUND") {
 					if (tempPressed.size() > 0) {
 						std::string tempStr = "";
-						std::sort(tempPressed.begin(), tempPressed.end());
 						for (auto key : tempPressed) {
 							tempStr += key;
 							tempStr += "+";
@@ -166,9 +242,18 @@ DWORD WINAPI ProcessInput(LPVOID lpReserved) {
 					for (auto part : action.second.as<std::string>() | std::views::split('+')) {
 						cnt++;
 						if (!currentlyPressed[std::string(part.begin(), part.end())]) {
+							if (action.first.starts_with("GEAR") && action.second.as<std::string>() != "NONE") {
+								if ((std::string(part.begin(), part.end()) == iniConfig["KEYBOARD"]["RANGE HIGH"].as<std::string>() && range == 1) ||
+									(std::string(part.begin(), part.end()) == iniConfig["KEYBOARD"]["RANGE LOW"].as<std::string>() && range == -1)) {
+									continue;
+								}
+							}
 							pressed = false;
 							break;
 						}
+					}
+					if (pressed && action.first.starts_with("GEAR")) {
+						goToNeutral = false;
 					}
 					if (pressed && wasPressedKb[action.first] == false) {
 						if (cnt > keyCount) { functionsToRun.clear(); }
@@ -179,17 +264,9 @@ DWORD WINAPI ProcessInput(LPVOID lpReserved) {
 			}
 			for (auto action : iniConfig["CONTROLLER"]) {
 				bool pressed = true;
-				if (action.second.as<std::string>() == "LISTENING") {
-					for (auto key : currentlyPressed) {
-						if (key.second && std::find(tempPressed.begin(), tempPressed.end(), key.first) == tempPressed.end()) {
-							tempPressed.push_back(key.first);
-						}
-					}
-				}
-				else if (action.second.as<std::string>() == "FOUND") {
+				if (action.second.as<std::string>() == "FOUND") {
 					if (tempPressed.size() > 0) {
 						std::string tempStr = "";
-						std::sort(tempPressed.begin(), tempPressed.end());
 						for (auto key : tempPressed) {
 							tempStr += key;
 							tempStr += "+";
@@ -207,9 +284,18 @@ DWORD WINAPI ProcessInput(LPVOID lpReserved) {
 					for (auto part : action.second.as<std::string>() | std::views::split('+')) {
 						cnt++;
 						if (!currentlyPressed[std::string(part.begin(), part.end())]) {
+							if (action.first.starts_with("GEAR") && action.second.as<std::string>() != "NONE") {
+								if ((std::string(part.begin(), part.end()) == iniConfig["CONTROLLER"]["RANGE HIGH"].as<std::string>() && range == 1) ||
+									(std::string(part.begin(), part.end()) == iniConfig["CONTROLLER"]["RANGE LOW"].as<std::string>() && range == -1)) {
+									continue;
+								}
+							}
 							pressed = false;
 							break;
 						}
+					}
+					if (pressed && action.first.starts_with("GEAR")) {
+						goToNeutral = false;
 					}
 					if (pressed && wasPressedJoy[action.first] == false) {
 						if (cnt > keyCount) { functionsToRun.clear(); }
@@ -219,8 +305,20 @@ DWORD WINAPI ProcessInput(LPVOID lpReserved) {
 				wasPressedJoy[action.first] = pressed;
 			}
 			for (auto fnc : functionsToRun) {
-				if (!iniConfig["OPTIONS"]["REQUIRE CLUTCH"].as<bool>() || wasPressedKb["CLUTCH"] || wasPressedJoy["CLUTCH"] || fnc == "SHOW MENU") {
-					bindFunctions[fnc]();
+				bindFunctions[fnc]();
+				if (iniConfig["OPTIONS"]["REQUIRE CLUTCH"].as<bool>()) {
+					if (auto veh = GetCurrentVehicle()) {
+						if (!wasPressedKb["CLUTCH"] && !wasPressedJoy["CLUTCH"]) {
+							if (fnc.starts_with("GEAR") && fnc != "GEAR N") {
+								veh->StallCounter = 5;
+							}
+						}
+					}
+				}
+			}
+			if (auto veh = GetCurrentVehicle()) {
+				if (goToNeutral && veh->TruckAction->Gear_1 != 0) {
+					bindFunctions["GEAR N"]();
 				}
 			}
 		}
@@ -231,7 +329,7 @@ DWORD WINAPI ProcessInput(LPVOID lpReserved) {
 
 		nextFrameTime += std::chrono::milliseconds(16);
 		std::this_thread::sleep_until(nextFrameTime);
-	} while (keepAlive);
+	}
 	return TRUE;
 }
 
@@ -261,8 +359,8 @@ void InitInput() {
 }
 
 void ShutdownInput() {
-	keepAlive = false;
-	Sleep(100);
+	keepAliveInput = false;
+	Sleep(1000);
 	if (inputManager) {
 		if (keyboard) {
 			inputManager->destroyInputObject(keyboard);

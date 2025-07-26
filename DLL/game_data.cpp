@@ -2,6 +2,7 @@
 #include "game_data.h"
 #include "memory.h"
 #include "config.h"
+#include "input.h"
 
 std::atomic<float> currentCoef = 1.01f;
 
@@ -14,16 +15,21 @@ std::int32_t Vehicle::GetMaxGear() const {
 }
 
 bool Vehicle::ShiftToGear(std::int32_t targetGear, float powerCoef) {
-	std::int32_t gear = std::clamp(targetGear, -1, GetMaxGear() + 1);
+	if (targetGear != 99) {
+		targetGear = std::clamp(targetGear, -1, GetMaxGear());
+	}
+	else {
+		targetGear = GetMaxGear() + 1;
+	}
 
 	if (iniConfig["OPTIONS"]["IMMERSIVE MODE"].as<bool>()) {
 		if (IsInAuto[this] == false) {
 			return true;
 		}
-		gear = std::clamp(targetGear, 1, GetMaxGear());
+		targetGear = std::clamp(targetGear, 1, GetMaxGear());
 	}
 
-	bool bSwitched = Hooked_ShiftGear(this, gear);
+	bool bSwitched = Hooked_ShiftGear(this, targetGear);
 
 	if (bSwitched) {
 		SetPowerCoef(powerCoef);
@@ -58,7 +64,7 @@ bool Vehicle::ShiftToPrevGear() {
 
 bool Vehicle::ShiftToHighGear() {
 	IsInAuto[this] = true;
-	return ShiftToGear(GetMaxGear() + 1);
+	return ShiftToGear(99);
 }
 
 bool Vehicle::ShiftToReverseGear() {
@@ -158,6 +164,7 @@ void Hooked_SetPowerCoef(Vehicle* veh, float coef) {
 }
 
 void Hooked_SetCurrentVehicle(combine_TRUCK_CONTROL* truckCtrl, Vehicle* veh) {
+	range = 0;
 	if (veh) {
 		IsInAuto[veh] = veh->TruckAction->IsInAutoMode;
 		if (IsInAuto[veh]) {

@@ -27,7 +27,9 @@ ini::IniFile WriteDefaultIniConfig() {
 	defaultIniConfig["KEYBOARD"]["GEAR UP"] = "NONE";
 	defaultIniConfig["KEYBOARD"]["GEAR DOWN"] = "NONE";
 	defaultIniConfig["KEYBOARD"]["CLUTCH"] = "NONE";
-	defaultIniConfig["KEYBOARD"]["SHOW MENU"] = "Win32InputManager.k.199";
+	defaultIniConfig["KEYBOARD"]["RANGE HIGH"] = "NONE";
+	defaultIniConfig["KEYBOARD"]["RANGE LOW"] = "NONE";
+	defaultIniConfig["KEYBOARD"]["SHOW MENU"] = "Kb.199";
 
 	defaultIniConfig["CONTROLLER"]["GEAR 1"] = "NONE";
 	defaultIniConfig["CONTROLLER"]["GEAR 2"] = "NONE";
@@ -50,12 +52,15 @@ ini::IniFile WriteDefaultIniConfig() {
 	defaultIniConfig["CONTROLLER"]["GEAR UP"] = "NONE";
 	defaultIniConfig["CONTROLLER"]["GEAR DOWN"] = "NONE";
 	defaultIniConfig["CONTROLLER"]["CLUTCH"] = "NONE";
+	defaultIniConfig["CONTROLLER"]["RANGE HIGH"] = "NONE";
+	defaultIniConfig["CONTROLLER"]["RANGE LOW"] = "NONE";
 	defaultIniConfig["CONTROLLER"]["SHOW MENU"] = "NONE";
 
 	defaultIniConfig["OPTIONS"]["DISABLE GAME SHIFTING"] = false;
 	defaultIniConfig["OPTIONS"]["SKIP NEUTRAL"] = false;
 	defaultIniConfig["OPTIONS"]["REQUIRE CLUTCH"] = false;
 	defaultIniConfig["OPTIONS"]["IMMERSIVE MODE"] = false;
+	defaultIniConfig["OPTIONS"]["REQUIRE GEAR HELD"] = false;
 
 	return defaultIniConfig;
 }

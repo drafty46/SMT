@@ -1,5 +1,7 @@
 #pragma once
 
+#define VERSION 1.1
+
 #include "framework.h"
 #include <Windows.h>
 #include <d3d11.h>
@@ -25,6 +27,9 @@
 #include <detours.h>
 #include <Psapi.h>
 #include <ranges>
+
+#define STR2(x) #x
+#define STR(x) STR2(x)
 
 struct FastIO {
 	FastIO() {

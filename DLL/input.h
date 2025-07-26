@@ -26,3 +26,6 @@ extern void ShutdownInput();
 extern OIS::InputManager* inputManager;
 extern OIS::Keyboard* keyboard;
 extern std::vector<OIS::JoyStick*> joystickList;
+extern std::set<std::string> tempPressed;
+extern std::atomic<bool> keepAliveInput;
+extern std::atomic<int32_t> range;
