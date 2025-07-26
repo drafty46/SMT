@@ -8,7 +8,6 @@ MODULEINFO mInfo;
 bool temp = GetModuleInformation(GetCurrentProcess(), hModule, &mInfo, sizeof(MODULEINFO));
 size_t base = (size_t)mInfo.lpBaseOfDll;
 size_t sizeOfImage = ((PIMAGE_NT_HEADERS)((uint8_t*)hModule + ((PIMAGE_DOS_HEADER)hModule)->e_lfanew))->OptionalHeader.SizeOfCode;
-std::atomic<bool> foundOffsets = false;
 
 uint32_t PatternScan(const char* signature, size_t begin = 0, size_t end = 0)
 {
@@ -164,8 +163,6 @@ void InitMemory() {
 	DetourAttach((PVOID*)&SetPowerCoefO, (PVOID)Hooked_SetPowerCoef);
 	DetourAttach((PVOID*)&SetCurrentVehicleO, (PVOID)Hooked_SetCurrentVehicle);
 	DetourTransactionCommit();
-
-	foundOffsets = true;
 
 	if (Vehicle* veh = GetCurrentVehicle()) {
 		IsInAuto[veh] = veh->TruckAction->IsInAutoMode;

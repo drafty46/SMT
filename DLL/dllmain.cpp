@@ -47,6 +47,7 @@ DWORD WINAPI MainThread(LPVOID lpReserved)
 	//AttachConsole();
 	LoadIniConfig();
 	InitMemory();
+	//Sleep(10000);
 	InitGui();
 	while (!isGuiInitialized) { Sleep(100); }
 	InitInput();

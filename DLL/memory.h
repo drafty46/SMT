@@ -44,6 +44,5 @@ extern void Hooked_SetCurrentVehicle(combine_TRUCK_CONTROL* truckCtrl, Vehicle* 
 
 extern void InitMemory();
 extern void ShutdownMemory();
-extern std::atomic<bool> foundOffsets;
 
 extern Vehicle* GetCurrentVehicle();

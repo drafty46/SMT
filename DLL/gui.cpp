@@ -166,13 +166,6 @@ HRESULT __stdcall hookedPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, U
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
 
-	if (!foundOffsets) {
-		ImFont* font = ImGui::GetFont();
-		float fontSize = ImGui::GetFontSize();
-		ImDrawList* drawList = ImGui::GetForegroundDrawList();
-		drawList->AddText(font, fontSize, ImVec2(10, 10), IM_COL32(255, 0, 0, 255), "SEARCHING OFFSETS...");
-	}
-
 	if (iniConfig["KEYBOARD"]["RANGE HIGH"].as<std::string>() != "NONE" || iniConfig["KEYBOARD"]["RANGE LOW"].as<std::string>() != "NONE" ||
 		iniConfig["CONTROLLER"]["RANGE HIGH"].as<std::string>() != "NONE" || iniConfig["CONTROLLER"]["RANGE LOW"].as<std::string>() != "NONE") {
 		ImFont* font = ImGui::GetFont();
@@ -297,8 +290,8 @@ HRESULT __stdcall hookedPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, U
 		if (ImGui::Button("Save config")) {
 			SaveIniConfig();
 		}
-		//ImGui::SameLine();
-		//ImGui::Text("Use left click to change keybind. Use right click to confirm or to clear if already set.");
+		ImGui::SameLine();
+		ImGui::Text("Use left click to change keybind. Use right click to confirm or to clear if already set.");
 		//ImGui::SameLine();
 		//ImGui::InvisibleButton("##debug_separator", ImVec2(width * 0.43f, ImGui::GetItemRectSize().y));
 		//ImGui::SameLine();
