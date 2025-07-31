@@ -30,7 +30,7 @@ When selected, LOW/HIGH simulate their key being pressed, so bind the same butto
 ## Credits
 
 ### [Ferrster](https://github.com/Ferrster) for [Snowrunner-Manual-Gearbox-Mod](https://github.com/Ferrster/Snowrunner-Manual-Gearbox-Mod) - reverse engineered game functions and data structures
-### [YAL-Game-Tools](https://github.com/YAL-Game-Tools) for [TinyModInjector](https://github.com/YAL-Game-Tools/TinyModInjector) - dll injector
+### [ThirteenAG](https://github.com/ThirteenAG) for [Ultimate-ASI-Loader](https://github.com/ThirteenAG/Ultimate-ASI-Loader) - injector
 ### [microsoft](https://github.com/microsoft) for [Detours](https://github.com/microsoft/Detours) - library
 ### [ocornut](https://github.com/ocornut) for [DearImgui](https://github.com/ocornut/imgui) - library
 ### [Rookfighter](https://github.com/Rookfighter) for [inifile-cpp](https://github.com/Rookfighter/inifile-cpp) - library

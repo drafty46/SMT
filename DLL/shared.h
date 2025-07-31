@@ -1,6 +1,6 @@
 #pragma once
 
-#define VERSION 1.1
+#define VERSION 1.2
 
 #include "framework.h"
 #include <Windows.h>
@@ -31,6 +31,8 @@
 #define STR2(x) #x
 #define STR(x) STR2(x)
 
+extern std::ofstream logFile;
+
 struct FastIO {
 	FastIO() {
 		std::ios_base::sync_with_stdio(false);
@@ -54,15 +56,21 @@ inline std::string currentTime() {
 template<typename T>
 inline void LogMessage(const T& msg) {
 	std::cout << currentTime() << ' ' << msg << '\n';
+	logFile << currentTime() << ' ' << msg << '\n';
 }
 
 template<typename T, typename... Args>
 inline void LogMessage(const T& first, const Args&... rest) {
 	std::cout << currentTime() << ' ' << first;
+	logFile << currentTime() << ' ' << first;
 	using expander = int[];
 	(void)expander {
 		0, (std::cout << ' ' << rest, 0)...
 	};
+	(void)expander {
+		0, (logFile << ' ' << rest, 0)...
+	};
 	std::cout << '\n';
+	logFile << '\n';
 }
 

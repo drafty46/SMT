@@ -170,7 +170,7 @@ void InitMemory() {
 		veh->ShiftToGear(1, 1.01);
 	}
 
-	LogMessage("init", ShiftGearO);
+	LogMessage("init", base);
 }
 
 void ShutdownMemory() {

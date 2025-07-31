@@ -7,6 +7,7 @@
 HMODULE g_hModule = NULL;
 std::atomic<bool> hasConsole = false;
 std::atomic<bool> alive = true;
+std::ofstream logFile;
 
 void AttachConsole()
 {
@@ -44,10 +45,12 @@ void DetachDLL() {
 
 DWORD WINAPI MainThread(LPVOID lpReserved)
 {
+	logFile.open("SMT_LOG.txt");
+	logFile << std::unitbuf;
 	//AttachConsole();
+	//Sleep(10000);
 	LoadIniConfig();
 	InitMemory();
-	//Sleep(10000);
 	InitGui();
 	while (!isGuiInitialized) { Sleep(100); }
 	InitInput();
@@ -70,6 +73,7 @@ BOOL WINAPI DllMain(HMODULE hMod, DWORD dwReason, LPVOID lpReserved)
 		ShutdownMemory();
 		ShutdownGui();
 		DetachConsole();
+		logFile.close();
 		break;
 	}
 	return TRUE;
