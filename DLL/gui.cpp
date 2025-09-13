@@ -291,7 +291,7 @@ HRESULT __stdcall hookedPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, U
 			SaveIniConfig();
 		}
 		ImGui::SameLine();
-		ImGui::Text("Use left click to change keybind. Use right click to confirm or to clear if already set.");
+		ImGui::Text("To change keybind left click on it, press desired keys/buttons/axis and right click to confirm. Use right click to clear a keybind.");
 		//ImGui::SameLine();
 		//ImGui::InvisibleButton("##debug_separator", ImVec2(width * 0.43f, ImGui::GetItemRectSize().y));
 		//ImGui::SameLine();

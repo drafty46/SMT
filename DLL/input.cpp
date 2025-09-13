@@ -11,6 +11,7 @@ OIS::InputManager* inputManager;
 std::atomic<bool> keepAliveInput = true;
 OIS::Keyboard* keyboard = nullptr;
 std::vector<OIS::JoyStick*> joystickList;
+OIS::Mouse* mouse = nullptr;
 std::unordered_map<std::string, bool> currentlyPressed;
 std::set<std::string> tempPressed;
 std::unordered_map<std::string, bool> wasPressedKb;
@@ -204,6 +205,28 @@ namespace SMT {
 		}
 		return true;
 	}
+
+	bool MouseListener::mousePressed(const OIS::MouseEvent& e, OIS::MouseButtonID button) {
+		std::string entry = "Ms." + std::to_string(button);
+		if ((int)button > 1) {
+			if (!currentlyPressed[entry]) {
+				tempPressed.emplace(entry);
+			}
+			currentlyPressed[entry] = true;
+		}
+		return true;
+	}
+
+	bool MouseListener::mouseReleased(const OIS::MouseEvent& e, OIS::MouseButtonID button) {
+		if ((int)button > 1) {
+			currentlyPressed["Ms." + std::to_string(button)] = false;
+		}
+		return true;
+	}
+
+	bool MouseListener::mouseMoved(const OIS::MouseEvent& e) {
+		return true;
+	}
 }
 
 DWORD WINAPI ProcessInput(LPVOID lpReserved) {
@@ -219,6 +242,7 @@ DWORD WINAPI ProcessInput(LPVOID lpReserved) {
 					js->capture();
 				}
 			}
+			mouse->capture();
 			bool goToNeutral = iniConfig["OPTIONS"]["REQUIRE GEAR HELD"].as<bool>();
 			for (auto action : iniConfig["KEYBOARD"]) {
 				bool pressed = true;
@@ -348,6 +372,7 @@ void InitInput() {
 			joystickList.push_back(static_cast<OIS::JoyStick*>(inputManager->createInputObject(device.first, true)));
 		}
 	}
+	mouse = static_cast<OIS::Mouse*>(inputManager->createInputObject(OIS::OISMouse, true));
 
 	SMT::KeyListener* myKeyListener = new SMT::KeyListener();
 	keyboard->setEventCallback(myKeyListener);
@@ -355,6 +380,9 @@ void InitInput() {
 	for (auto& js : joystickList) {
 		js->setEventCallback(myJoyStickListener);
 	}
+	SMT::MouseListener* myMouseListener = new SMT::MouseListener();
+	mouse->setEventCallback(myMouseListener);
+
 	CreateThread(nullptr, 0, ProcessInput, GetModuleHandleA(NULL), 0, nullptr);
 }
 
@@ -367,6 +395,9 @@ void ShutdownInput() {
 		}
 		for (auto& js : joystickList) {
 			inputManager->destroyInputObject(js);
+		}
+		if (mouse) {
+			inputManager->destroyInputObject(mouse);
 		}
 		OIS::InputManager::destroyInputSystem(inputManager);
 	}

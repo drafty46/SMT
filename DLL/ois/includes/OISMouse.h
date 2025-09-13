@@ -13,15 +13,15 @@ Permission is granted to anyone to use this software for any purpose, including
 commercial applications, and to alter it and redistribute it freely, subject to the
 following restrictions:
 
-    1. The origin of this software must not be misrepresented; you must not claim that
-        you wrote the original software. If you use this software in a product,
-        an acknowledgment in the product documentation would be appreciated
-        but is not required.
+	1. The origin of this software must not be misrepresented; you must not claim that
+		you wrote the original software. If you use this software in a product,
+		an acknowledgment in the product documentation would be appreciated
+		but is not required.
 
-    2. Altered source versions must be plainly marked as such, and must not be
-        misrepresented as being the original software.
+	2. Altered source versions must be plainly marked as such, and must not be
+		misrepresented as being the original software.
 
-    3. This notice may not be removed or altered from any source distribution.   
+	3. This notice may not be removed or altered from any source distribution.
 */
 #ifndef OIS_Mouse_H
 #define OIS_Mouse_H
@@ -33,13 +33,13 @@ namespace OIS
 	//! Button ID for mouse devices
 	enum MouseButtonID {
 		MB_Left = 0,
-		MB_Right,
-		MB_Middle,
-		MB_Button3,
-		MB_Button4,
-		MB_Button5,
-		MB_Button6,
-		MB_Button7
+		MB_Right = 1,
+		MB_Middle = 2,
+		MB_Button3 = 3,
+		MB_Button4 = 4,
+		MB_Button5 = 5,
+		MB_Button6 = 6,
+		MB_Button7 = 7
 	};
 
 	/**
@@ -50,7 +50,8 @@ namespace OIS
 	{
 	public:
 		MouseState() :
-		 width(50), height(50), buttons(0) {};
+			width(50), height(50), buttons(0) {
+		};
 
 		/** Represents the height/width of your display area.. used if mouse clipping
 		or mouse grabbed in case of X11 - defaults to 50.. Make sure to set this
@@ -90,8 +91,9 @@ namespace OIS
 	{
 	public:
 		MouseEvent(Object* obj, const MouseState& ms) :
-		 EventArg(obj), state(ms) { }
-		virtual ~MouseEvent() { }
+			EventArg(obj), state(ms) {
+		}
+		virtual ~MouseEvent() {}
 
 		//! The state of the mouse - including buttons and axes
 		const MouseState& state;
@@ -109,9 +111,9 @@ namespace OIS
 	class _OISExport MouseListener
 	{
 	public:
-		virtual ~MouseListener() { }
-		virtual bool mouseMoved(const MouseEvent& arg)						= 0;
-		virtual bool mousePressed(const MouseEvent& arg, MouseButtonID id)	= 0;
+		virtual ~MouseListener() {}
+		virtual bool mouseMoved(const MouseEvent& arg) = 0;
+		virtual bool mousePressed(const MouseEvent& arg, MouseButtonID id) = 0;
 		virtual bool mouseReleased(const MouseEvent& arg, MouseButtonID id) = 0;
 	};
 
@@ -122,7 +124,7 @@ namespace OIS
 	class _OISExport Mouse : public Object
 	{
 	public:
-		virtual ~Mouse() { }
+		virtual ~Mouse() {}
 
 		/**
 		@remarks
@@ -141,7 +143,8 @@ namespace OIS
 
 	protected:
 		Mouse(const std::string& vendor, bool buffered, int devID, InputManager* creator) :
-		 Object(vendor, OISMouse, buffered, devID, creator), mListener(0) { }
+			Object(vendor, OISMouse, buffered, devID, creator), mListener(0) {
+		}
 
 		//! The state of the mouse
 		MouseState mState;

@@ -1,6 +1,6 @@
 #pragma once
 
-#define VERSION 1.2
+#define VERSION 1.3
 
 #include "framework.h"
 #include <Windows.h>
