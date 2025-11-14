@@ -108,9 +108,7 @@ void Hooked_ShiftToAutoGear(Vehicle* veh) {
 	veh->TruckAction->IsInAutoMode = false;
 
 	if (veh->TruckAction->Gear_1 == (GetMaxGearO(veh) + 1)) {
-		ShiftToAutoGearO(veh);
-		veh->TruckAction->IsInAutoMode = false;
-		veh->SetPowerCoef(1.01f);
+		veh->ShiftToGear(round(veh->GetMaxGear() * 0.8), 1.0f);
 	}
 	else if (veh->TruckAction->Gear_1 <= 1) {
 		veh->ShiftToGear(1, 1.01f);

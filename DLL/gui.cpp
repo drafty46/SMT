@@ -166,8 +166,9 @@ HRESULT __stdcall hookedPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, U
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
 
-	if (iniConfig["KEYBOARD"]["RANGE HIGH"].as<std::string>() != "NONE" || iniConfig["KEYBOARD"]["RANGE LOW"].as<std::string>() != "NONE" ||
-		iniConfig["CONTROLLER"]["RANGE HIGH"].as<std::string>() != "NONE" || iniConfig["CONTROLLER"]["RANGE LOW"].as<std::string>() != "NONE") {
+	if ((iniConfig["KEYBOARD"]["RANGE HIGH"].as<std::string>() != "NONE" || iniConfig["KEYBOARD"]["RANGE LOW"].as<std::string>() != "NONE" ||
+		iniConfig["CONTROLLER"]["RANGE HIGH"].as<std::string>() != "NONE" || iniConfig["CONTROLLER"]["RANGE LOW"].as<std::string>() != "NONE") &&
+		GetCurrentVehicle()) {
 		ImFont* font = ImGui::GetFont();
 		float fontSize = 30.0f;
 		ImDrawList* drawList = ImGui::GetForegroundDrawList();
@@ -235,7 +236,7 @@ HRESULT __stdcall hookedPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, U
 		ImGui::EndChild();
 		ImGui::SameLine();
 		ImGui::BeginChild("ControllerTable", ImVec2(tableWidth * 2, height * 0.545f), true);
-		if (ImGui::BeginTable("Settings##2", 2), ImGuiTableFlags_ScrollX) {
+		if (ImGui::BeginTable("Settings##2", 2, ImGuiTableFlags_ScrollX)) {
 			ImGui::TableSetupScrollFreeze(0, 1);
 			ImGui::TableSetupColumn("Controller", ImGuiTableColumnFlags_WidthFixed);
 			ImGui::TableSetupColumn("Key", ImGuiTableColumnFlags_WidthFixed);
