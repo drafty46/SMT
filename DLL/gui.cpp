@@ -100,13 +100,6 @@ void InitImGui()
 	io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
 	//io.ConfigDebugHighlightIdConflicts = false;
 	io.FontDefault = io.Fonts->AddFontFromMemoryTTF((void*)TTLakesNeue_DemiBold_ttf, TTLakesNeue_DemiBold_ttf_len, 24.0f);
-	RECT rect;
-	GetClientRect(window, &rect);
-	topLeft = { rect.left, rect.top };
-	ClientToScreen(window, &topLeft);
-	width = rect.right - rect.left;
-	height = rect.bottom - rect.top;
-	tableWidth = width * 0.9f / 5;
 	ImGui_ImplWin32_Init(window);
 	ImGui_ImplDX11_Init(pDevice, pContext);
 	if (iniConfig["KEYBOARD"]["SHOW MENU"].as<std::string>() == "NONE") {
@@ -166,13 +159,15 @@ HRESULT __stdcall hookedPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, U
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
 
+	ImVec2 viewport = ImGui::GetMainViewport()->Size;
+
 	if ((iniConfig["KEYBOARD"]["RANGE HIGH"].as<std::string>() != "NONE" || iniConfig["KEYBOARD"]["RANGE LOW"].as<std::string>() != "NONE" ||
 		iniConfig["CONTROLLER"]["RANGE HIGH"].as<std::string>() != "NONE" || iniConfig["CONTROLLER"]["RANGE LOW"].as<std::string>() != "NONE") &&
 		GetCurrentVehicle()) {
 		ImFont* font = ImGui::GetFont();
 		float fontSize = 30.0f;
 		ImDrawList* drawList = ImGui::GetForegroundDrawList();
-		ImVec2 pos = ImVec2(width * 0.88f, height * 0.975f);
+		ImVec2 pos = ImVec2(viewport.x * 0.88f, viewport.y * 0.975f);
 		ImVec2 boxPos = ImVec2(pos.x * 0.975f, pos.y * 0.999f);
 		drawList->AddImage((ImTextureID)boxTexture, boxPos, ImVec2(boxPos.x + boxWidth, boxPos.y + boxHeight * 0.8f), ImVec2(0, 0), ImVec2(1, 1), IM_COL32(255, 255, 255, 127));
 		switch (range) {
@@ -201,10 +196,10 @@ HRESULT __stdcall hookedPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, U
 			ImGuiWindowFlags_NoCollapse |
 			ImGuiWindowFlags_NoMove
 		);
-		ImGui::SetWindowPos(ImVec2(topLeft.x + width * 0.05f, topLeft.y + height * 0.05f), ImGuiCond_Always);
-		ImGui::SetWindowSize(ImVec2(width * 0.9f, height * 0.65f), ImGuiCond_Always);
+		ImGui::SetWindowPos(ImVec2(viewport.x * 0.05f, viewport.y * 0.05f), ImGuiCond_Always);
+		ImGui::SetWindowSize(ImVec2(viewport.x * 0.9f, viewport.y * 0.65f), ImGuiCond_Always);
 
-		ImGui::BeginChild("KeyboardTable", ImVec2(tableWidth * 2, height * 0.545f), true);
+		ImGui::BeginChild("KeyboardTable", ImVec2(viewport.x * 0.36f, viewport.y * 0.56f), true);
 		if (ImGui::BeginTable("Settings##1", 2, ImGuiTableFlags_ScrollX)) {
 			ImGui::TableSetupScrollFreeze(0, 1);
 			ImGui::TableSetupColumn("Keyboard", ImGuiTableColumnFlags_WidthFixed);
@@ -235,7 +230,7 @@ HRESULT __stdcall hookedPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, U
 		}
 		ImGui::EndChild();
 		ImGui::SameLine();
-		ImGui::BeginChild("ControllerTable", ImVec2(tableWidth * 2, height * 0.545f), true);
+		ImGui::BeginChild("ControllerTable", ImVec2(viewport.x * 0.36f, viewport.y * 0.56f), true);
 		if (ImGui::BeginTable("Settings##2", 2, ImGuiTableFlags_ScrollX)) {
 			ImGui::TableSetupScrollFreeze(0, 1);
 			ImGui::TableSetupColumn("Controller", ImGuiTableColumnFlags_WidthFixed);
@@ -266,7 +261,7 @@ HRESULT __stdcall hookedPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, U
 		}
 		ImGui::EndChild();
 		ImGui::SameLine();
-		ImGui::BeginChild("OptionsTable", ImVec2(tableWidth * 0.9f, height * 0.545f), true);
+		ImGui::BeginChild("OptionsTable", ImVec2(viewport.x * 0.16f, viewport.y * 0.56f), true);
 		if (ImGui::BeginTable("Settings##3", 2, ImGuiTableFlags_ScrollX)) {
 			ImGui::TableSetupScrollFreeze(0, 1);
 			ImGui::TableSetupColumn("Options", ImGuiTableColumnFlags_WidthFixed);
