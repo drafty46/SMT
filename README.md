@@ -14,7 +14,7 @@ Shifting can either be done with the game's ui shifter and keybinds to shift up/
 
 ## Usage
 
-The mod's menu, where all configuration is done, is bound to the home key by default.
+The mod's menu, where all configuration is done, is bound to the deleste key by default.
 
 ![alt text](image.png)
 

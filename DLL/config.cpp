@@ -29,7 +29,7 @@ ini::IniFile WriteDefaultIniConfig() {
 	defaultIniConfig["KEYBOARD"]["CLUTCH"] = "NONE";
 	defaultIniConfig["KEYBOARD"]["RANGE HIGH"] = "NONE";
 	defaultIniConfig["KEYBOARD"]["RANGE LOW"] = "NONE";
-	defaultIniConfig["KEYBOARD"]["SHOW MENU"] = "Kb.199";
+	defaultIniConfig["KEYBOARD"]["SHOW MENU"] = "Kb.211";
 
 	defaultIniConfig["CONTROLLER"]["GEAR 1"] = "NONE";
 	defaultIniConfig["CONTROLLER"]["GEAR 2"] = "NONE";
