@@ -56,18 +56,18 @@ public:
 
 class Vehicle {
 public:
-	char pad_0000[120];                               // 0x0000
-	class combine_TRUCK_ADDON_MODEL* TruckAddonModel; // 0x0078
-	class combine_combineTruckAction* TruckAction;    // 0x0080
+	char pad_0000[96];                               // 0x0000
+	class combine_TRUCK_ADDON_MODEL* TruckAddonModel; // 0x0078 -- OFFSET NOT UPDATED
+	class combine_combineTruckAction* TruckAction;    // 0x0068
 	class combine_combineTruckPostSimulationListener
-		* TruckPostSimulationListener; // 0x0088
-	char pad_0090[164];               // 0x0090
-	float StallCounter;               // 0x0134
-	char pad_0138[1496];              // 0x0138
-	std::uint32_t Ignition;           // 0x0710
-	char pad_0714[84];                // 0x0714
-	std::uint32_t q_VehStateFlags;    // 0x0768
-	char pad_076C[244];               // 0x076C
+		* TruckPostSimulationListener; // 0x0088 -- OFFSET NOT UPDATED
+	char pad_0090[164];               // 0x0090 -- OFFSET NOT UPDATED
+	float StallCounter;               // 0x011C
+	char pad_0138[1496];              // 0x0138 -- OFFSET NOT UPDATED
+	std::uint32_t Ignition;           // 0x0710 -- OFFSET NOT UPDATED
+	char pad_0714[84];                // 0x0714 -- OFFSET NOT UPDATED
+	std::uint32_t q_VehStateFlags;    // 0x0768 -- OFFSET NOT UPDATED
+	char pad_076C[244];               // 0x076C -- NOT UPDATED
 	void SetPowerCoef(float coef);
 
 	std::int32_t GetMaxGear() const;

@@ -116,26 +116,25 @@ Vehicle* GetCurrentVehicle() {
 }
 
 void InitMemory() {
-	int32_t ShiftGearOffset = PatternScan("48 89 74 24 10 48 89 7C 24 18 41 56 48 83 EC 20 48 8B 81 60 01 00 00 48 8B F1 48 B9 FF FF FF FF FF FF 00 FF 8B FA 48 23 C1");
+	int32_t ShiftGearOffset = PatternScan("48 89 74 24 10 48 89 7C 24 18 41 56 48 83 EC 20 48 8B 81 48 01 00 00 48 8B F1 48 B9 FF FF FF FF FF FF 00 FF 8B FA 48 23 C1 74");//
 	LogMessage("ShiftGear:", std::format("{:08x}", ShiftGearOffset));
-	int32_t ShiftToAutoGearOffset = PatternScan("40 57 48 81 EC 80 00 00 00 48 8B 81 80 00 00 00 48 8B F9 48 89 9C 24 90 00 00 00 0F 29 7C 24 60 C6 40 3C 01 48 8B 41 78 48 8B 90 "
-		"28 02 00 00 0F 10 8A 30 02 00 00 0F 59 8A 70 01 00 00 0F 28 F9 0F 28 C1 0F C6 C1 00 0F C6 F9 55 0F 58 F8 0F C6 C9 AA 0F 57 C0 0F 58 F9 F3 0F 5A C7");
+	int32_t ShiftToAutoGearOffset = PatternScan("40 57 48 81 EC 80 00 00 00 48 8B 41 68 48 8B F9 48 89 9C 24 90 00 00 00 0F 29 7C 24 60 C6 40 3C 01 48 8B 41 60 48 8B 90 30 02 00 00 0F 10 8A 30 02 00 00 0F 59 8A 70 01 00 00");//
 	LogMessage("ShiftToAutoGear:", std::format("{:08x}", ShiftToAutoGearOffset));
-	int32_t ShiftToHighOffset = PatternScan("40 53 48 83 EC 20 48 8B D9 E8 ? ? ? ? 48 8B CB 8D 50 01 48 83 C4 20 5B");
+	int32_t ShiftToHighOffset = PatternScan("40 53 48 83 EC 20 48 8B D9 E8 ? ? ? ? 48 8B CB 8D 50 01 48 83 C4 20 5B");//
 	LogMessage("ShiftToHigh:", std::format("{:08x}", ShiftToHighOffset));
-	int32_t ShiftToReverseOffset = PatternScan("BA FF FF FF FF E9 ? ? ? ? CC");
+	int32_t ShiftToReverseOffset = PatternScan("BA FF FF FF FF E9 ? ? ? ? CC");//
 	LogMessage("ShiftToReverse:", std::format("{:08x}", ShiftToReverseOffset));
 	int32_t ShiftToNeutralOffset = PatternScan("33 D2 E9 ? ? ? ? CC", ShiftToHighOffset, ShiftToReverseOffset);
 	LogMessage("ShiftToNeutral:", std::format("{:08x}", ShiftToNeutralOffset));
-	int32_t GetMaxGearOffset = PatternScan("48 8B 81 80 00 00 00 48 8B 50 58 48 8B 48 60 48 3B D1 75 ? 33 C0 C3 48 2B CA 48 C1 F9 02 8D 41 FE");
+	int32_t GetMaxGearOffset = PatternScan("48 8B 41 68 48 8B 50 58 48 8B 48 60 48 3B D1 75 ? 33 C0 C3 48 2B CA 48 C1 F9 02 8D 41 FE");//
 	LogMessage("GetMaxGear:", std::format("{:08x}", GetMaxGearOffset));
-	int32_t DisableAutoAndShiftOffset = PatternScan("48 8B 81 80 00 00 00 C6 40 3C 00 E9 ? ? ? ? CC");
+	int32_t DisableAutoAndShiftOffset = PatternScan("48 8B 41 68 C6 40 3C 00 E9");//
 	LogMessage("DisableAutoAndShift:", std::format("{:08x}", DisableAutoAndShiftOffset));
-	int32_t SetPowerCoefOffset = PatternScan("48 8B 81 80 00 00 00 F3 0F 11 48 38 C3 CC");
+	int32_t SetPowerCoefOffset = PatternScan("48 8B 41 68 F3 0F 11 48 38 C3");//
 	LogMessage("SetPowerCoef:", std::format("{:08x}", SetPowerCoefOffset));
-	int32_t SetCurrentVehicleOffset = PatternScan("48 8B C4 53 57 48 81 EC 98 00 00 00 48 8B FA 48 8B D9 48 39 51 08 0F 84 ? ? ? ? 48 89 68 E8 48 83 C1 70 48 89 70 E0 4C 89 70 D8 4C 89 78 D0");
+	int32_t SetCurrentVehicleOffset = PatternScan("48 8B C4 53 57 48 81 EC 98 00 00 00 48 8B FA 48 8B D9 48 39 51 08 0F 84 ? ? ? ? 48 89 68 E8 48 83 C1 70 48 89 70 E0 4C 89 70 D8 4C 89 78 D0");//
 	LogMessage("SetCurrentVehicle:", std::format("{:08x}", SetCurrentVehicleOffset));
-	int32_t combine_TRUCK_CONTROLOffset = DigAHole(PatternScan("40 53 48 83 EC 20 48 8B D9 E8 ? ? ? ? 33 C9 48 89 18"));
+	int32_t combine_TRUCK_CONTROLOffset = DigAHole(PatternScan("40 53 48 83 EC 20 48 8B D9 E8 ? ? ? ? 33 C9 48 89 18"));//
 	LogMessage("combine_TRUCK_CONTROL:", std::format("{:08x}", (combine_TRUCK_CONTROLOffset)));
 
 	TruckControlPtr = (combine_TRUCK_CONTROL**)(base + combine_TRUCK_CONTROLOffset);

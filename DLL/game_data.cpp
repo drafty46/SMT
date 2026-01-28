@@ -100,18 +100,19 @@ std::int32_t Hooked_GetMaxGear(const Vehicle* veh) {
 }
 
 void Hooked_ShiftToAutoGear(Vehicle* veh) {
+	veh->TruckAction->IsInAutoMode = false;
+
 	if (iniConfig["OPTIONS"]["DISABLE GAME SHIFTING"].as<bool>()) {
 		return;
 	}
 
 	IsInAuto[veh] = true;
-	veh->TruckAction->IsInAutoMode = false;
 
 	if (veh->TruckAction->Gear_1 == (GetMaxGearO(veh) + 1)) {
 		veh->ShiftToGear(round(veh->GetMaxGear() * 0.8), 1.0f);
 	}
 	else if (veh->TruckAction->Gear_1 <= 1) {
-		veh->ShiftToGear(1, 1.01f);
+		veh->ShiftToGear(1, 1.05f);
 	}
 	if (!iniConfig["OPTIONS"]["REQUIRE CLUTCH"].as<bool>() && !iniConfig["OPTIONS"]["IMMERSIVE MODE"].as<bool>()) {
 		ShiftToAutoGearO(veh);
