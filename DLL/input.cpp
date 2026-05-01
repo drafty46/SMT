@@ -4,6 +4,8 @@
 #include "gui.h"
 #include "game_data.h"
 #include "memory.h"
+#include <mutex>
+#include <Xinput.h>
 
 extern std::unordered_map <Vehicle*, std::atomic<bool>> IsInAuto;
 
@@ -17,6 +19,138 @@ std::set<std::string> tempPressed;
 std::unordered_map<std::string, bool> wasPressedKb;
 std::unordered_map<std::string, bool> wasPressedJoy;
 std::atomic<int32_t> range = 0;
+
+std::string abbreviate(const std::string& input);
+
+namespace {
+	constexpr int32_t CONTROLLER_AXIS_THRESHOLD = 20000;
+	std::mutex tempPressedMutex;
+
+	enum class InputGroup {
+		Keyboard,
+		Controller
+	};
+
+	std::set<std::string> tempPressedKeyboard;
+	std::set<std::string> tempPressedController;
+
+	std::set<std::string>& TempPressedFor(InputGroup group) {
+		return group == InputGroup::Keyboard ? tempPressedKeyboard : tempPressedController;
+	}
+
+	void AddTempPressed(InputGroup group, const std::string& entry) {
+		std::lock_guard<std::mutex> lock(tempPressedMutex);
+		TempPressedFor(group).emplace(entry);
+	}
+
+	void SetPressed(InputGroup group, const std::string& entry, bool pressed) {
+		if (pressed && !currentlyPressed[entry]) {
+			AddTempPressed(group, entry);
+		}
+		currentlyPressed[entry] = pressed;
+	}
+
+	std::string ControllerPrefix(const OIS::Object* device) {
+		return abbreviate(device->vendor());
+	}
+
+	std::string ConsumeTempPressed(InputGroup group, bool noneWhenEmpty = true) {
+		std::lock_guard<std::mutex> lock(tempPressedMutex);
+		std::set<std::string>& tempPressedSet = TempPressedFor(group);
+		if (tempPressedSet.empty()) {
+			return noneWhenEmpty ? "NONE" : "";
+		}
+
+		std::string tempStr;
+		for (const auto& key : tempPressedSet) {
+			tempStr += key;
+			tempStr += "+";
+		}
+		tempStr.pop_back();
+		tempPressedSet.clear();
+		return tempStr;
+	}
+
+	void PollJoyStickState(const OIS::JoyStick* joystick) {
+		const std::string controller = ControllerPrefix(joystick);
+		const OIS::JoyStickState& state = joystick->getJoyStickState();
+
+		for (size_t button = 0; button < state.mButtons.size(); ++button) {
+			SetPressed(InputGroup::Controller, controller + ".b." + std::to_string(button), state.mButtons[button]);
+		}
+
+		for (size_t axis = 0; axis < state.mAxes.size(); ++axis) {
+			SetPressed(InputGroup::Controller, controller + ".a." + std::to_string(axis) + ".p", state.mAxes[axis].abs > CONTROLLER_AXIS_THRESHOLD);
+			SetPressed(InputGroup::Controller, controller + ".a." + std::to_string(axis) + ".n", state.mAxes[axis].abs < -CONTROLLER_AXIS_THRESHOLD);
+		}
+
+		for (int32_t slider = 0; slider < 4; ++slider) {
+			SetPressed(InputGroup::Controller, controller + ".s.x." + std::to_string(slider) + ".p", state.mSliders[slider].abX > CONTROLLER_AXIS_THRESHOLD);
+			SetPressed(InputGroup::Controller, controller + ".s.x." + std::to_string(slider) + ".n", state.mSliders[slider].abX < -CONTROLLER_AXIS_THRESHOLD);
+			SetPressed(InputGroup::Controller, controller + ".s.y." + std::to_string(slider) + ".p", state.mSliders[slider].abY > CONTROLLER_AXIS_THRESHOLD);
+			SetPressed(InputGroup::Controller, controller + ".s.y." + std::to_string(slider) + ".n", state.mSliders[slider].abY < -CONTROLLER_AXIS_THRESHOLD);
+		}
+
+		for (int32_t pov = 0; pov < 4; ++pov) {
+			SetPressed(InputGroup::Controller, controller + ".p." + std::to_string(pov) + ".up", (state.mPOV[pov].direction & OIS::Pov::North) != 0);
+			SetPressed(InputGroup::Controller, controller + ".p." + std::to_string(pov) + ".down", (state.mPOV[pov].direction & OIS::Pov::South) != 0);
+			SetPressed(InputGroup::Controller, controller + ".p." + std::to_string(pov) + ".right", (state.mPOV[pov].direction & OIS::Pov::East) != 0);
+			SetPressed(InputGroup::Controller, controller + ".p." + std::to_string(pov) + ".left", (state.mPOV[pov].direction & OIS::Pov::West) != 0);
+		}
+	}
+
+	void SetXInputButton(DWORD userIndex, const std::string& name, WORD buttons, WORD mask) {
+		SetPressed(InputGroup::Controller, "Xi." + std::to_string(userIndex) + ".b." + name, (buttons & mask) != 0);
+	}
+
+	void SetXInputAxis(DWORD userIndex, const std::string& name, int32_t value) {
+		SetPressed(InputGroup::Controller, "Xi." + std::to_string(userIndex) + ".a." + name + ".p", value > CONTROLLER_AXIS_THRESHOLD);
+		SetPressed(InputGroup::Controller, "Xi." + std::to_string(userIndex) + ".a." + name + ".n", value < -CONTROLLER_AXIS_THRESHOLD);
+	}
+
+	void PollXInputController(DWORD userIndex) {
+		XINPUT_STATE state = {};
+		const bool connected = XInputGetState(userIndex, &state) == ERROR_SUCCESS;
+		const WORD buttons = connected ? state.Gamepad.wButtons : 0;
+		const BYTE leftTrigger = connected ? state.Gamepad.bLeftTrigger : 0;
+		const BYTE rightTrigger = connected ? state.Gamepad.bRightTrigger : 0;
+
+		SetXInputButton(userIndex, "DU", buttons, XINPUT_GAMEPAD_DPAD_UP);
+		SetXInputButton(userIndex, "DD", buttons, XINPUT_GAMEPAD_DPAD_DOWN);
+		SetXInputButton(userIndex, "DL", buttons, XINPUT_GAMEPAD_DPAD_LEFT);
+		SetXInputButton(userIndex, "DR", buttons, XINPUT_GAMEPAD_DPAD_RIGHT);
+		SetXInputButton(userIndex, "START", buttons, XINPUT_GAMEPAD_START);
+		SetXInputButton(userIndex, "BACK", buttons, XINPUT_GAMEPAD_BACK);
+		SetXInputButton(userIndex, "LS", buttons, XINPUT_GAMEPAD_LEFT_THUMB);
+		SetXInputButton(userIndex, "RS", buttons, XINPUT_GAMEPAD_RIGHT_THUMB);
+		SetXInputButton(userIndex, "LB", buttons, XINPUT_GAMEPAD_LEFT_SHOULDER);
+		SetXInputButton(userIndex, "RB", buttons, XINPUT_GAMEPAD_RIGHT_SHOULDER);
+		SetXInputButton(userIndex, "A", buttons, XINPUT_GAMEPAD_A);
+		SetXInputButton(userIndex, "B", buttons, XINPUT_GAMEPAD_B);
+		SetXInputButton(userIndex, "X", buttons, XINPUT_GAMEPAD_X);
+		SetXInputButton(userIndex, "Y", buttons, XINPUT_GAMEPAD_Y);
+
+		SetPressed(InputGroup::Controller, "Xi." + std::to_string(userIndex) + ".t.L", leftTrigger > XINPUT_GAMEPAD_TRIGGER_THRESHOLD);
+		SetPressed(InputGroup::Controller, "Xi." + std::to_string(userIndex) + ".t.R", rightTrigger > XINPUT_GAMEPAD_TRIGGER_THRESHOLD);
+
+		SetXInputAxis(userIndex, "LX", connected ? state.Gamepad.sThumbLX : 0);
+		SetXInputAxis(userIndex, "LY", connected ? state.Gamepad.sThumbLY : 0);
+		SetXInputAxis(userIndex, "RX", connected ? state.Gamepad.sThumbRX : 0);
+		SetXInputAxis(userIndex, "RY", connected ? state.Gamepad.sThumbRY : 0);
+	}
+
+	void PollXInputControllers() {
+		for (DWORD userIndex = 0; userIndex < XUSER_MAX_COUNT; ++userIndex) {
+			PollXInputController(userIndex);
+		}
+	}
+}
+
+void ClearTempPressed() {
+	std::lock_guard<std::mutex> lock(tempPressedMutex);
+	tempPressedKeyboard.clear();
+	tempPressedController.clear();
+}
 
 std::unordered_map<std::string, std::function<void()>> bindFunctions = {
 	{ "GEAR 1",[]() { if (auto veh = GetCurrentVehicle()) { IsInAuto[veh] = true; veh->ShiftToGear(1); } }},
@@ -65,161 +199,62 @@ namespace SMT {
 
 	bool KeyListener::keyPressed(const OIS::KeyEvent& e) {
 		std::string entry = "Kb." + std::to_string(e.key);
-		if (!currentlyPressed[entry]) {
-			tempPressed.emplace(entry);
-		}
-		currentlyPressed[entry] = true;
+		SetPressed(InputGroup::Keyboard, entry, true);
 		return true;
 	}
 
 	bool KeyListener::keyReleased(const OIS::KeyEvent& e) {
-		currentlyPressed["Kb." + std::to_string(e.key)] = false;
+		SetPressed(InputGroup::Keyboard, "Kb." + std::to_string(e.key), false);
 		return true;
 	}
 
 	bool JoyStickListener::buttonPressed(const OIS::JoyStickEvent& e, int button) {
-		std::string entry = abbreviate(e.device->vendor()) + ".b." + std::to_string(button);
-		if (!currentlyPressed[entry]) {
-			tempPressed.emplace(entry);
-		}
-		currentlyPressed[entry] = true;
+		std::string entry = ControllerPrefix(e.device) + ".b." + std::to_string(button);
+		SetPressed(InputGroup::Controller, entry, true);
 		return true;
 	}
 
 	bool JoyStickListener::buttonReleased(const OIS::JoyStickEvent& e, int button) {
-		currentlyPressed[abbreviate(e.device->vendor()) + ".b." + std::to_string(button)] = false;
+		SetPressed(InputGroup::Controller, ControllerPrefix(e.device) + ".b." + std::to_string(button), false);
 		return true;
 	}
 
 	bool JoyStickListener::axisMoved(const OIS::JoyStickEvent& e, int axis) {
-		if (e.state.mAxes[axis].abs > 20000) {
-			std::string entry = abbreviate(e.device->vendor()) + ".a." + std::to_string(axis) + ".p";
-			if (!currentlyPressed[entry]) {
-				tempPressed.emplace(entry);
-			}
-			currentlyPressed[entry] = true;
-		}
-		else {
-			currentlyPressed[abbreviate(e.device->vendor()) + ".a." + std::to_string(axis) + ".p"] = false;
-		}
-		if (e.state.mAxes[axis].abs < -20000) {
-			std::string entry = abbreviate(e.device->vendor()) + ".a." + std::to_string(axis) + ".n";
-			if (!currentlyPressed[entry]) {
-				tempPressed.emplace(entry);
-			}
-			currentlyPressed[entry] = true;
-		}
-		else {
-			currentlyPressed[abbreviate(e.device->vendor()) + ".a." + std::to_string(axis) + ".n"] = false;
-		}
+		std::string controller = ControllerPrefix(e.device);
+		SetPressed(InputGroup::Controller, controller + ".a." + std::to_string(axis) + ".p", e.state.mAxes[axis].abs > CONTROLLER_AXIS_THRESHOLD);
+		SetPressed(InputGroup::Controller, controller + ".a." + std::to_string(axis) + ".n", e.state.mAxes[axis].abs < -CONTROLLER_AXIS_THRESHOLD);
 		return true;
 	}
 
 	bool JoyStickListener::sliderMoved(const OIS::JoyStickEvent& e, int sliderID) {
-		if (e.state.mSliders[sliderID].abX > 20000) {
-			std::string entry = abbreviate(e.device->vendor()) + ".s.x." + std::to_string(sliderID) + ".p";
-			if (!currentlyPressed[entry]) {
-				tempPressed.emplace(entry);
-			}
-			currentlyPressed[entry] = true;
-		}
-		else {
-			currentlyPressed[abbreviate(e.device->vendor()) + ".s.x." + std::to_string(sliderID) + ".p"] = false;
-		}
-		if (e.state.mSliders[sliderID].abX < -20000) {
-			std::string entry = abbreviate(e.device->vendor()) + ".s.x." + std::to_string(sliderID) + ".n";
-			if (!currentlyPressed[entry]) {
-				tempPressed.emplace(entry);
-			}
-			currentlyPressed[entry] = true;
-		}
-		else {
-			currentlyPressed[abbreviate(e.device->vendor()) + ".s.x." + std::to_string(sliderID) + ".n"] = false;
-		}
-		if (e.state.mSliders[sliderID].abY > 20000) {
-			std::string entry = abbreviate(e.device->vendor()) + ".s.y." + std::to_string(sliderID) + ".p";
-			if (!currentlyPressed[entry]) {
-				tempPressed.emplace(entry);
-			}
-			currentlyPressed[entry] = true;
-		}
-		else {
-			currentlyPressed[abbreviate(e.device->vendor()) + ".s.y." + std::to_string(sliderID) + ".p"] = false;
-		}
-		if (e.state.mSliders[sliderID].abY < -20000) {
-			std::string entry = abbreviate(e.device->vendor()) + ".s.y." + std::to_string(sliderID) + ".n";
-			if (!currentlyPressed[entry]) {
-				tempPressed.emplace(entry);
-			}
-			currentlyPressed[entry] = true;
-		}
-		else {
-			currentlyPressed[abbreviate(e.device->vendor()) + ".s.y." + std::to_string(sliderID) + ".n"] = false;
-		}
+		std::string controller = ControllerPrefix(e.device);
+		SetPressed(InputGroup::Controller, controller + ".s.x." + std::to_string(sliderID) + ".p", e.state.mSliders[sliderID].abX > CONTROLLER_AXIS_THRESHOLD);
+		SetPressed(InputGroup::Controller, controller + ".s.x." + std::to_string(sliderID) + ".n", e.state.mSliders[sliderID].abX < -CONTROLLER_AXIS_THRESHOLD);
+		SetPressed(InputGroup::Controller, controller + ".s.y." + std::to_string(sliderID) + ".p", e.state.mSliders[sliderID].abY > CONTROLLER_AXIS_THRESHOLD);
+		SetPressed(InputGroup::Controller, controller + ".s.y." + std::to_string(sliderID) + ".n", e.state.mSliders[sliderID].abY < -CONTROLLER_AXIS_THRESHOLD);
 		return true;
 	}
 
 	bool JoyStickListener::povMoved(const OIS::JoyStickEvent& e, int pov) {
-		if ((e.state.mPOV[pov].direction & OIS::Pov::North) != 0) {
-			std::string entry = abbreviate(e.device->vendor()) + ".p." + std::to_string(pov) + ".up";
-			if (!currentlyPressed[entry]) {
-				tempPressed.emplace(entry);
-			}
-			currentlyPressed[entry] = true;
-		}
-		else {
-			currentlyPressed[abbreviate(e.device->vendor()) + ".p." + std::to_string(pov) + ".up"] = false;
-		}
-
-		if ((e.state.mPOV[pov].direction & OIS::Pov::South) != 0) {
-			std::string entry = abbreviate(e.device->vendor()) + ".p." + std::to_string(pov) + ".down";
-			if (!currentlyPressed[entry]) {
-				tempPressed.emplace(entry);
-			}
-			currentlyPressed[entry] = true;
-		}
-		else {
-			currentlyPressed[abbreviate(e.device->vendor()) + ".p." + std::to_string(pov) + ".down"] = false;
-		}
-
-		if ((e.state.mPOV[pov].direction & OIS::Pov::East) != 0) {
-			std::string entry = abbreviate(e.device->vendor()) + ".p." + std::to_string(pov) + ".right";
-			if (!currentlyPressed[entry]) {
-				tempPressed.emplace(entry);
-			}
-			currentlyPressed[entry] = true;
-		}
-		else {
-			currentlyPressed[abbreviate(e.device->vendor()) + ".p." + std::to_string(pov) + ".right"] = false;
-		}
-
-		if ((e.state.mPOV[pov].direction & OIS::Pov::West) != 0) {
-			std::string entry = abbreviate(e.device->vendor()) + ".p." + std::to_string(pov) + ".left";
-			if (!currentlyPressed[entry]) {
-				tempPressed.emplace(entry);
-			}
-			currentlyPressed[entry] = true;
-		}
-		else {
-			currentlyPressed[abbreviate(e.device->vendor()) + ".p." + std::to_string(pov) + ".left"] = false;
-		}
+		std::string controller = ControllerPrefix(e.device);
+		SetPressed(InputGroup::Controller, controller + ".p." + std::to_string(pov) + ".up", (e.state.mPOV[pov].direction & OIS::Pov::North) != 0);
+		SetPressed(InputGroup::Controller, controller + ".p." + std::to_string(pov) + ".down", (e.state.mPOV[pov].direction & OIS::Pov::South) != 0);
+		SetPressed(InputGroup::Controller, controller + ".p." + std::to_string(pov) + ".right", (e.state.mPOV[pov].direction & OIS::Pov::East) != 0);
+		SetPressed(InputGroup::Controller, controller + ".p." + std::to_string(pov) + ".left", (e.state.mPOV[pov].direction & OIS::Pov::West) != 0);
 		return true;
 	}
 
 	bool MouseListener::mousePressed(const OIS::MouseEvent& e, OIS::MouseButtonID button) {
 		std::string entry = "Ms." + std::to_string(button);
 		if ((int)button > 1) {
-			if (!currentlyPressed[entry]) {
-				tempPressed.emplace(entry);
-			}
-			currentlyPressed[entry] = true;
+			SetPressed(InputGroup::Keyboard, entry, true);
 		}
 		return true;
 	}
 
 	bool MouseListener::mouseReleased(const OIS::MouseEvent& e, OIS::MouseButtonID button) {
 		if ((int)button > 1) {
-			currentlyPressed["Ms." + std::to_string(button)] = false;
+			SetPressed(InputGroup::Keyboard, "Ms." + std::to_string(button), false);
 		}
 		return true;
 	}
@@ -240,35 +275,34 @@ DWORD WINAPI ProcessInput(LPVOID lpReserved) {
 			if (GetForegroundWindow() == window) {
 				for (auto& js : joystickList) {
 					js->capture();
+					PollJoyStickState(js);
 				}
 			}
+			PollXInputControllers();
 			mouse->capture();
 			bool goToNeutral = iniConfig["OPTIONS"]["REQUIRE GEAR HELD"].as<bool>();
 			for (auto action : iniConfig["KEYBOARD"]) {
 				bool pressed = true;
-				if (action.second.as<std::string>() == "FOUND") {
-					if (tempPressed.size() > 0) {
-						std::string tempStr = "";
-						for (auto key : tempPressed) {
-							tempStr += key;
-							tempStr += "+";
-						}
-						tempStr.pop_back();
-						iniConfig["KEYBOARD"][action.first] = tempStr;
+				std::string binding = action.second.as<std::string>();
+				if (binding == "FOUND") {
+					iniConfig["KEYBOARD"][action.first] = ConsumeTempPressed(InputGroup::Keyboard);
+				}
+				else if (binding == "LISTENING") {
+					std::string captured = ConsumeTempPressed(InputGroup::Keyboard, false);
+					if (!captured.empty()) {
+						iniConfig["KEYBOARD"][action.first] = captured;
 					}
-					else {
-						iniConfig["KEYBOARD"][action.first] = "NONE";
-					}
-					tempPressed.clear();
+					pressed = false;
 				}
 				else {
 					int32_t cnt = 0;
-					for (auto part : action.second.as<std::string>() | std::views::split('+')) {
+					for (auto part : binding | std::views::split('+')) {
 						cnt++;
 						if (!currentlyPressed[std::string(part.begin(), part.end())]) {
-							if (action.first.starts_with("GEAR") && action.second.as<std::string>() != "NONE") {
-								if ((std::string(part.begin(), part.end()) == iniConfig["KEYBOARD"]["RANGE HIGH"].as<std::string>() && range == 1) ||
-									(std::string(part.begin(), part.end()) == iniConfig["KEYBOARD"]["RANGE LOW"].as<std::string>() && range == -1)) {
+							std::string partStr(part.begin(), part.end());
+							if (action.first.starts_with("GEAR") && binding != "NONE") {
+								if ((partStr == iniConfig["KEYBOARD"]["RANGE HIGH"].as<std::string>() && range == 1) ||
+									(partStr == iniConfig["KEYBOARD"]["RANGE LOW"].as<std::string>() && range == -1)) {
 									continue;
 								}
 							}
@@ -288,29 +322,26 @@ DWORD WINAPI ProcessInput(LPVOID lpReserved) {
 			}
 			for (auto action : iniConfig["CONTROLLER"]) {
 				bool pressed = true;
-				if (action.second.as<std::string>() == "FOUND") {
-					if (tempPressed.size() > 0) {
-						std::string tempStr = "";
-						for (auto key : tempPressed) {
-							tempStr += key;
-							tempStr += "+";
-						}
-						tempStr.pop_back();
-						iniConfig["CONTROLLER"][action.first] = tempStr;
+				std::string binding = action.second.as<std::string>();
+				if (binding == "FOUND") {
+					iniConfig["CONTROLLER"][action.first] = ConsumeTempPressed(InputGroup::Controller);
+				}
+				else if (binding == "LISTENING") {
+					std::string captured = ConsumeTempPressed(InputGroup::Controller, false);
+					if (!captured.empty()) {
+						iniConfig["CONTROLLER"][action.first] = captured;
 					}
-					else {
-						iniConfig["CONTROLLER"][action.first] = "NONE";
-					}
-					tempPressed.clear();
+					pressed = false;
 				}
 				else {
 					int32_t cnt = 0;
-					for (auto part : action.second.as<std::string>() | std::views::split('+')) {
+					for (auto part : binding | std::views::split('+')) {
 						cnt++;
 						if (!currentlyPressed[std::string(part.begin(), part.end())]) {
-							if (action.first.starts_with("GEAR") && action.second.as<std::string>() != "NONE") {
-								if ((std::string(part.begin(), part.end()) == iniConfig["CONTROLLER"]["RANGE HIGH"].as<std::string>() && range == 1) ||
-									(std::string(part.begin(), part.end()) == iniConfig["CONTROLLER"]["RANGE LOW"].as<std::string>() && range == -1)) {
+							std::string partStr(part.begin(), part.end());
+							if (action.first.starts_with("GEAR") && binding != "NONE") {
+								if ((partStr == iniConfig["CONTROLLER"]["RANGE HIGH"].as<std::string>() && range == 1) ||
+									(partStr == iniConfig["CONTROLLER"]["RANGE LOW"].as<std::string>() && range == -1)) {
 									continue;
 								}
 							}

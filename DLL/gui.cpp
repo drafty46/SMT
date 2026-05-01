@@ -215,7 +215,7 @@ HRESULT __stdcall hookedPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, U
 				std::string buttonText = entry.second.as<std::string>() + "##" + std::to_string(++count);
 				if (ImGui::Button(buttonText.c_str())) {
 					iniConfig["KEYBOARD"][entry.first] = "LISTENING";
-					tempPressed.clear();
+					ClearTempPressed();
 				}
 				if (ImGui::IsItemClicked(ImGuiMouseButton_Right)) {
 					if (entry.second.as<std::string>() == "LISTENING") {
@@ -246,7 +246,7 @@ HRESULT __stdcall hookedPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, U
 				std::string buttonText = entry.second.as<std::string>() + "##" + std::to_string(++count);
 				if (ImGui::Button(buttonText.c_str())) {
 					iniConfig["CONTROLLER"][entry.first] = "LISTENING";
-					tempPressed.clear();
+					ClearTempPressed();
 				}
 				if (ImGui::IsItemClicked(ImGuiMouseButton_Right)) {
 					if (entry.second.as<std::string>() == "LISTENING") {
@@ -287,7 +287,7 @@ HRESULT __stdcall hookedPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, U
 			SaveIniConfig();
 		}
 		ImGui::SameLine();
-		ImGui::Text("To change keybind left click on it, press desired keys/buttons/axis and right click to confirm. Use right click to clear a keybind.");
+		ImGui::Text("To change a keybind left click on it and press the desired key/button/axis. Use right click to clear a keybind.");
 		//ImGui::SameLine();
 		//ImGui::InvisibleButton("##debug_separator", ImVec2(width * 0.43f, ImGui::GetItemRectSize().y));
 		//ImGui::SameLine();

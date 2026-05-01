@@ -92,7 +92,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\kiero;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\imgui\backends;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\detours\include;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\imgui</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)kiero;$(ProjectDir)imgui\backends;$(ProjectDir)detours\include;$(ProjectDir)imgui;$(ProjectDir)ois\includes;$(ProjectDir)stb;$(ProjectDir)tsl;$(ProjectDir)inifile-cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
@@ -100,7 +100,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\detours\lib.X64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)detours\lib.X64;$(ProjectDir)ois\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -112,7 +112,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>shared.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\stb;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\ois\includes;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\tsl;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\inifile-cpp\include;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\zydis\include;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\sdl\include;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\sdl3\include\SDL3;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\kiero\minhook\include;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\imgui\backends;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\kiero;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\detours\include;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)kiero;$(ProjectDir)imgui\backends;$(ProjectDir)detours\include;$(ProjectDir)imgui;$(ProjectDir)ois\includes;$(ProjectDir)stb;$(ProjectDir)tsl;$(ProjectDir)inifile-cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -123,8 +123,8 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>d3d11.lib;d3dcompiler.lib;dxgi.lib;dxguid.lib;detours.lib;user32.lib;OIS.lib;dinput8.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\ois\lib;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\zydis\lib;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\sdl\lib\x64;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\sdl3\lib\x64;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x64;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\kiero\minhook\lib;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\detours\lib.X64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>d3d11.lib;d3dcompiler.lib;dxgi.lib;dxguid.lib;detours.lib;user32.lib;OIS.lib;dinput8.lib;xinput.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)detours\lib.X64;$(ProjectDir)ois\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -135,7 +135,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\kiero;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\imgui\backends;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\detours\include;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\imgui</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)kiero;$(ProjectDir)imgui\backends;$(ProjectDir)detours\include;$(ProjectDir)imgui;$(ProjectDir)ois\includes;$(ProjectDir)stb;$(ProjectDir)tsl;$(ProjectDir)inifile-cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
@@ -143,7 +143,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\detours\lib.X64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)detours\lib.X64;$(ProjectDir)ois\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -157,7 +157,7 @@
       <PrecompiledHeaderFile>shared.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\stb;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\ois\includes;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\tsl;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\inifile-cpp\include;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\zydis\include;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\sdl\include;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\sdl3\include\SDL3;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\kiero\minhook\include;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\imgui\backends;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\kiero;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\detours\include;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)kiero;$(ProjectDir)imgui\backends;$(ProjectDir)detours\include;$(ProjectDir)imgui;$(ProjectDir)ois\includes;$(ProjectDir)stb;$(ProjectDir)tsl;$(ProjectDir)inifile-cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PreprocessorDefinitions>SDL_STATIC;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Optimization>MaxSpeed</Optimization>
@@ -166,8 +166,8 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>d3d11.lib;d3dcompiler.lib;dxgi.lib;dxguid.lib;detours.lib;user32.lib;OIS.lib;dinput8.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\ois\lib;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\zydis\lib;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\sdl\lib\x64;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\sdl3\lib\x64;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x64;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\kiero\minhook\lib;D:\Users\draft\source\repos\SnowRunner Manual Transmission\DLL\detours\lib.X64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>d3d11.lib;d3dcompiler.lib;dxgi.lib;dxguid.lib;detours.lib;user32.lib;OIS.lib;dinput8.lib;xinput.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)detours\lib.X64;$(ProjectDir)ois\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
