@@ -33,6 +33,7 @@
 #define STR(x) STR2(x)
 
 extern std::ofstream logFile;
+extern bool IsDebugLoggingEnabled();
 
 struct FastIO {
 	FastIO() {
@@ -75,3 +76,18 @@ inline void LogMessage(const T& first, const Args&... rest) {
 	logFile << '\n';
 }
 
+template<typename T>
+inline void DebugLogMessage(const T& msg) {
+	if (!IsDebugLoggingEnabled()) {
+		return;
+	}
+	LogMessage(msg);
+}
+
+template<typename T, typename... Args>
+inline void DebugLogMessage(const T& first, const Args&... rest) {
+	if (!IsDebugLoggingEnabled()) {
+		return;
+	}
+	LogMessage(first, rest...);
+}

@@ -29,6 +29,7 @@ namespace SMT {
 
 extern void InitInput();
 extern void ShutdownInput();
+extern void ClearTempPressed();
 extern OIS::InputManager* inputManager;
 extern OIS::Keyboard* keyboard;
 extern OIS::Mouse* mouse;

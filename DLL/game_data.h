@@ -4,6 +4,7 @@
 inline const float PowerCoefLowGear = .45f;
 inline const float PowerCoefLowPlusGear = 1.f;
 inline const float PowerCoefLowMinusGear = .2f;
+inline const float PowerCoefDefaultGear = 1.05f;
 
 class String {
 public:
@@ -219,4 +220,7 @@ public:
 	char pad_0000[1032]; // 0x0000
 };                     // Size: 0x0408
 
-extern std::unordered_map <Vehicle*, std::atomic<bool>> IsInAuto;
+extern bool GetIsInAuto(const Vehicle* veh);
+extern void SetIsInAuto(const Vehicle* veh, bool value);
+extern void SetDefaultGearState(const Vehicle* veh);
+extern void SyncVehicleStateFromTruckAction(Vehicle* veh);

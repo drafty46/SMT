@@ -214,16 +214,11 @@ HRESULT __stdcall hookedPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, U
 				ImGui::TableSetColumnIndex(1);
 				std::string buttonText = entry.second.as<std::string>() + "##" + std::to_string(++count);
 				if (ImGui::Button(buttonText.c_str())) {
-					iniConfig["KEYBOARD"][entry.first] = "LISTENING";
-					tempPressed.clear();
+					SetBindingValue("KEYBOARD", entry.first, "LISTENING");
+					ClearTempPressed();
 				}
 				if (ImGui::IsItemClicked(ImGuiMouseButton_Right)) {
-					if (entry.second.as<std::string>() == "LISTENING") {
-						iniConfig["KEYBOARD"][entry.first] = "FOUND";
-					}
-					else {
-						iniConfig["KEYBOARD"][entry.first] = "NONE";
-					}
+					SetBindingValue("KEYBOARD", entry.first, "NONE");
 				}
 			}
 			ImGui::EndTable();
@@ -245,16 +240,11 @@ HRESULT __stdcall hookedPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, U
 				ImGui::TableSetColumnIndex(1);
 				std::string buttonText = entry.second.as<std::string>() + "##" + std::to_string(++count);
 				if (ImGui::Button(buttonText.c_str())) {
-					iniConfig["CONTROLLER"][entry.first] = "LISTENING";
-					tempPressed.clear();
+					SetBindingValue("CONTROLLER", entry.first, "LISTENING");
+					ClearTempPressed();
 				}
 				if (ImGui::IsItemClicked(ImGuiMouseButton_Right)) {
-					if (entry.second.as<std::string>() == "LISTENING") {
-						iniConfig["CONTROLLER"][entry.first] = "FOUND";
-					}
-					else {
-						iniConfig["CONTROLLER"][entry.first] = "NONE";
-					}
+					SetBindingValue("CONTROLLER", entry.first, "NONE");
 				}
 			}
 			ImGui::EndTable();
@@ -274,8 +264,10 @@ HRESULT __stdcall hookedPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, U
 				ImGui::Dummy(ImVec2(0, 0.1f));
 				ImGui::Text(entry.first.c_str());
 				ImGui::TableSetColumnIndex(1);
-				if (ImGui::Button(entry.second.as<bool>() ? std::string("True##" + entry.first).c_str() : std::string("False##" + entry.first).c_str())) {
-					iniConfig["OPTIONS"][entry.first] = !entry.second.as<bool>();
+				bool optionValue = GetRuntimeOptionValue(entry.first);
+				if (ImGui::Button(optionValue ? std::string("True##" + entry.first).c_str() : std::string("False##" + entry.first).c_str())) {
+					SetRuntimeOptionValue(entry.first, !optionValue);
+					SaveIniConfig();
 				}
 			}
 
@@ -287,7 +279,7 @@ HRESULT __stdcall hookedPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, U
 			SaveIniConfig();
 		}
 		ImGui::SameLine();
-		ImGui::Text("To change keybind left click on it, press desired keys/buttons/axis and right click to confirm. Use right click to clear a keybind.");
+		ImGui::Text("To change a keybind left click on it and press the desired key/button/axis. Use right click to clear a keybind.");
 		//ImGui::SameLine();
 		//ImGui::InvisibleButton("##debug_separator", ImVec2(width * 0.43f, ImGui::GetItemRectSize().y));
 		//ImGui::SameLine();
