@@ -164,9 +164,12 @@ void InitMemory() {
 	DetourTransactionCommit();
 
 	if (Vehicle* veh = GetCurrentVehicle()) {
-		IsInAuto[veh] = veh->TruckAction->IsInAutoMode;
-		veh->TruckAction->IsInAutoMode = false;
-		veh->ShiftToGear(1, 1.05);
+		SyncVehicleStateFromTruckAction(veh);
+		if (GetRuntimeOption(RuntimeOption::DisableGameShifting)
+			|| GetRuntimeOption(RuntimeOption::ImmersiveMode)
+			|| GetRuntimeOption(RuntimeOption::RequireClutch)) {
+			veh->TruckAction->IsInAutoMode = false;
+		}
 	}
 
 	LogMessage("init", base);

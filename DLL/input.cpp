@@ -7,8 +7,6 @@
 #include <mutex>
 #include <Xinput.h>
 
-extern std::unordered_map <Vehicle*, std::atomic<bool>> IsInAuto;
-
 OIS::InputManager* inputManager;
 std::atomic<bool> keepAliveInput = true;
 OIS::Keyboard* keyboard = nullptr;
@@ -153,7 +151,7 @@ void ClearTempPressed() {
 }
 
 std::unordered_map<std::string, std::function<void()>> bindFunctions = {
-	{ "GEAR 1",[]() { if (auto veh = GetCurrentVehicle()) { IsInAuto[veh] = true; veh->ShiftToGear(1); } }},
+	{ "GEAR 1",[]() { if (auto veh = GetCurrentVehicle()) veh->ShiftToGear(1); }},
 	{ "GEAR 2",[]() { if (auto veh = GetCurrentVehicle()) veh->ShiftToGear(2); } },
 	{ "GEAR 3",[]() { if (auto veh = GetCurrentVehicle()) veh->ShiftToGear(3); } },
 	{ "GEAR 4",[]() { if (auto veh = GetCurrentVehicle()) veh->ShiftToGear(4); } },
@@ -280,17 +278,17 @@ DWORD WINAPI ProcessInput(LPVOID lpReserved) {
 			}
 			PollXInputControllers();
 			mouse->capture();
-			bool goToNeutral = iniConfig["OPTIONS"]["REQUIRE GEAR HELD"].as<bool>();
+			bool goToNeutral = GetRuntimeOption(RuntimeOption::RequireGearHeld);
 			for (auto action : iniConfig["KEYBOARD"]) {
 				bool pressed = true;
 				std::string binding = action.second.as<std::string>();
 				if (binding == "FOUND") {
-					iniConfig["KEYBOARD"][action.first] = ConsumeTempPressed(InputGroup::Keyboard);
+					SetBindingValue("KEYBOARD", action.first, ConsumeTempPressed(InputGroup::Keyboard));
 				}
 				else if (binding == "LISTENING") {
 					std::string captured = ConsumeTempPressed(InputGroup::Keyboard, false);
 					if (!captured.empty()) {
-						iniConfig["KEYBOARD"][action.first] = captured;
+						SetBindingValue("KEYBOARD", action.first, captured);
 					}
 					pressed = false;
 				}
@@ -324,12 +322,12 @@ DWORD WINAPI ProcessInput(LPVOID lpReserved) {
 				bool pressed = true;
 				std::string binding = action.second.as<std::string>();
 				if (binding == "FOUND") {
-					iniConfig["CONTROLLER"][action.first] = ConsumeTempPressed(InputGroup::Controller);
+					SetBindingValue("CONTROLLER", action.first, ConsumeTempPressed(InputGroup::Controller));
 				}
 				else if (binding == "LISTENING") {
 					std::string captured = ConsumeTempPressed(InputGroup::Controller, false);
 					if (!captured.empty()) {
-						iniConfig["CONTROLLER"][action.first] = captured;
+						SetBindingValue("CONTROLLER", action.first, captured);
 					}
 					pressed = false;
 				}
@@ -360,8 +358,11 @@ DWORD WINAPI ProcessInput(LPVOID lpReserved) {
 				wasPressedJoy[action.first] = pressed;
 			}
 			for (auto fnc : functionsToRun) {
+				if (fnc.starts_with("GEAR") || fnc == "RANGE HIGH" || fnc == "RANGE LOW") {
+					DebugLogMessage("InputAction", fnc);
+				}
 				bindFunctions[fnc]();
-				if (iniConfig["OPTIONS"]["REQUIRE CLUTCH"].as<bool>()) {
+				if (GetRuntimeOption(RuntimeOption::RequireClutch)) {
 					if (auto veh = GetCurrentVehicle()) {
 						if (!wasPressedKb["CLUTCH"] && !wasPressedJoy["CLUTCH"]) {
 							if (fnc.starts_with("GEAR") && fnc != "GEAR N") {
