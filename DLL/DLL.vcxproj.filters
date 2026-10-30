@@ -45,25 +45,10 @@
     <ClInclude Include="imgui\imgui_internal.h">
       <Filter>Header Files\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="imgui\examples\libs\emscripten\emscripten_mainloop_stub.h">
-      <Filter>Header Files\ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="imgui\examples\libs\glfw\include\GLFW\glfw3.h">
-      <Filter>Header Files\ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="imgui\examples\libs\glfw\include\GLFW\glfw3native.h">
-      <Filter>Header Files\ImGui</Filter>
-    </ClInclude>
     <ClInclude Include="imgui\imconfig.h">
       <Filter>Header Files\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="imgui\examples\example_allegro5\imconfig_allegro5.h">
-      <Filter>Header Files\ImGui</Filter>
-    </ClInclude>
     <ClInclude Include="imgui\imgui.h">
-      <Filter>Header Files\ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="imgui\misc\freetype\imgui_freetype.h">
       <Filter>Header Files\ImGui</Filter>
     </ClInclude>
     <ClInclude Include="imgui\backends\imgui_impl_allegro5.h">
@@ -130,12 +115,6 @@
       <Filter>Header Files\ImGui</Filter>
     </ClInclude>
     <ClInclude Include="imgui\backends\imgui_impl_win32.h">
-      <Filter>Header Files\ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="imgui\misc\single_file\imgui_single_file.h">
-      <Filter>Header Files\ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="imgui\misc\cpp\imgui_stdlib.h">
       <Filter>Header Files\ImGui</Filter>
     </ClInclude>
     <ClInclude Include="imgui\imstb_rectpack.h">
