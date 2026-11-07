@@ -275,7 +275,15 @@ HRESULT __stdcall hookedPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, U
 				ImGui::Text(entry.first.c_str());
 				ImGui::TableSetColumnIndex(1);
 				if (ImGui::Button(entry.second.as<bool>() ? std::string("True##" + entry.first).c_str() : std::string("False##" + entry.first).c_str())) {
-					iniConfig["OPTIONS"][entry.first] = !entry.second.as<bool>();
+					const bool enabled = !entry.second.as<bool>();
+					const bool shiftMode = entry.first == "PADDLE SHIFT MODE" || entry.first == "DISABLE GAME SHIFTING";
+					iniConfig["OPTIONS"][entry.first] = enabled;
+					if (enabled && shiftMode) {
+						iniConfig["OPTIONS"][entry.first == "PADDLE SHIFT MODE" ? "DISABLE GAME SHIFTING" : "PADDLE SHIFT MODE"] = false;
+					}
+					if (shiftMode || entry.first == "IMMERSIVE MODE" || entry.first == "REQUIRE CLUTCH") {
+						ApplyShiftingOptions();
+					}
 				}
 			}
 

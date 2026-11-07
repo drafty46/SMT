@@ -57,6 +57,7 @@ ini::IniFile WriteDefaultIniConfig() {
 	defaultIniConfig["CONTROLLER"]["SHOW MENU"] = "NONE";
 
 	defaultIniConfig["OPTIONS"]["DISABLE GAME SHIFTING"] = false;
+	defaultIniConfig["OPTIONS"]["PADDLE SHIFT MODE"] = false;
 	defaultIniConfig["OPTIONS"]["SKIP NEUTRAL"] = false;
 	defaultIniConfig["OPTIONS"]["REQUIRE CLUTCH"] = false;
 	defaultIniConfig["OPTIONS"]["IMMERSIVE MODE"] = false;
@@ -80,6 +81,9 @@ void LoadIniConfig() {
 	else {
 		iniConfig.save(configFilename);
 		LogMessage("Ini config not found. Using default.");
+	}
+	if (iniConfig["OPTIONS"]["PADDLE SHIFT MODE"].as<bool>()) {
+		iniConfig["OPTIONS"]["DISABLE GAME SHIFTING"] = false;
 	}
 }
 

@@ -28,6 +28,13 @@
 #include <detours.h>
 #include <Psapi.h>
 #include <ranges>
+#include <algorithm>
+#include <atomic>
+#include <cmath>
+#include <format>
+#include <functional>
+#include <set>
+#include <unordered_map>
 
 #define STR2(x) #x
 #define STR(x) STR2(x)

@@ -19,7 +19,7 @@ std::unordered_map<std::string, bool> wasPressedJoy;
 std::atomic<int32_t> range = 0;
 
 std::unordered_map<std::string, std::function<void()>> bindFunctions = {
-	{ "GEAR 1",[]() { if (auto veh = GetCurrentVehicle()) { IsInAuto[veh] = true; veh->ShiftToGear(1); } }},
+	{ "GEAR 1",[]() { if (auto veh = GetCurrentVehicle()) { if (!iniConfig["OPTIONS"]["PADDLE SHIFT MODE"].as<bool>()) IsInAuto[veh] = true; veh->ShiftToGear(1); } }},
 	{ "GEAR 2",[]() { if (auto veh = GetCurrentVehicle()) veh->ShiftToGear(2); } },
 	{ "GEAR 3",[]() { if (auto veh = GetCurrentVehicle()) veh->ShiftToGear(3); } },
 	{ "GEAR 4",[]() { if (auto veh = GetCurrentVehicle()) veh->ShiftToGear(4); } },
@@ -44,6 +44,25 @@ std::unordered_map<std::string, std::function<void()>> bindFunctions = {
 	{ "RANGE LOW",[]() { if (range > -1) range--; }},
 	{ "SHOW MENU",[]() {showGui = !showGui; } }
 };
+
+void RunBinding(const std::string& action) {
+	if (iniConfig["OPTIONS"]["PADDLE SHIFT MODE"].as<bool>() && action.starts_with("GEAR")) {
+		const auto veh = GetCurrentVehicle();
+		if (!veh || !IsInAuto[veh] || action == "GEAR L-" || action == "GEAR L" || action == "GEAR L+") {
+			return;
+		}
+	}
+	bindFunctions[action]();
+	if (iniConfig["OPTIONS"]["REQUIRE CLUTCH"].as<bool>()) {
+		if (auto veh = GetCurrentVehicle()) {
+			if (!wasPressedKb["CLUTCH"] && !wasPressedJoy["CLUTCH"]) {
+				if (action.starts_with("GEAR") && action != "GEAR N") {
+					veh->StallCounter = 5;
+				}
+			}
+		}
+	}
+}
 
 extern void DetachDLL();
 
@@ -243,7 +262,8 @@ DWORD WINAPI ProcessInput(LPVOID lpReserved) {
 				}
 			}
 			mouse->capture();
-			bool goToNeutral = iniConfig["OPTIONS"]["REQUIRE GEAR HELD"].as<bool>();
+			bool goToNeutral = iniConfig["OPTIONS"]["REQUIRE GEAR HELD"].as<bool>() &&
+				!iniConfig["OPTIONS"]["PADDLE SHIFT MODE"].as<bool>();
 			for (auto action : iniConfig["KEYBOARD"]) {
 				bool pressed = true;
 				if (action.second.as<std::string>() == "FOUND") {
@@ -329,16 +349,7 @@ DWORD WINAPI ProcessInput(LPVOID lpReserved) {
 				wasPressedJoy[action.first] = pressed;
 			}
 			for (auto fnc : functionsToRun) {
-				bindFunctions[fnc]();
-				if (iniConfig["OPTIONS"]["REQUIRE CLUTCH"].as<bool>()) {
-					if (auto veh = GetCurrentVehicle()) {
-						if (!wasPressedKb["CLUTCH"] && !wasPressedJoy["CLUTCH"]) {
-							if (fnc.starts_with("GEAR") && fnc != "GEAR N") {
-								veh->StallCounter = 5;
-							}
-						}
-					}
-				}
+				RunBinding(fnc);
 			}
 			if (auto veh = GetCurrentVehicle()) {
 				if (goToNeutral && veh->TruckAction->Gear_1 != 0) {

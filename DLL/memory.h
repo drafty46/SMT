@@ -30,6 +30,10 @@ using Fnc_GetMaxGear = std::int32_t(const Vehicle* veh);
 extern Fnc_GetMaxGear* GetMaxGearO;
 extern std::int32_t Hooked_GetMaxGear(const Vehicle* veh);
 
+using Fnc_IsGearRobot = bool(Vehicle* veh);
+extern Fnc_IsGearRobot* IsGearRobotO;
+extern bool Hooked_IsGearRobot(Vehicle* veh);
+
 using Fnc_DisableAutoAndShift = bool(Vehicle* veh, std::int32_t gear);
 extern Fnc_DisableAutoAndShift* DisableAutoAndShiftO;
 extern bool Hooked_DisableAutoAndShift(Vehicle* veh, std::int32_t gear);

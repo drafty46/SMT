@@ -103,11 +103,15 @@ Fnc_ShiftToHigh* ShiftToHighO = nullptr;
 Fnc_ShiftToReverse* ShiftToReverseO = nullptr;
 Fnc_ShiftToNeutral* ShiftToNeutralO = nullptr;
 Fnc_GetMaxGear* GetMaxGearO = nullptr;
+Fnc_IsGearRobot* IsGearRobotO = nullptr;
 Fnc_DisableAutoAndShift* DisableAutoAndShiftO = nullptr;
 Fnc_SetPowerCoef* SetPowerCoefO = nullptr;
 Fnc_SetCurrentVehicle* SetCurrentVehicleO = nullptr;
 
 Vehicle* GetCurrentVehicle() {
+	if (!TruckControlPtr) {
+		return nullptr;
+	}
 	combine_TRUCK_CONTROL* truckCtrl = *TruckControlPtr;
 	if (truckCtrl == nullptr) {
 		return nullptr;
@@ -128,6 +132,11 @@ void InitMemory() {
 	LogMessage("ShiftToNeutral:", std::format("{:08x}", ShiftToNeutralOffset));
 	int32_t GetMaxGearOffset = PatternScan("48 8B 41 68 48 8B 50 58 48 8B 48 60 48 3B D1 75 ? 33 C0 C3 48 2B CA 48 C1 F9 02 8D 41 FE");//
 	LogMessage("GetMaxGear:", std::format("{:08x}", GetMaxGearOffset));
+	int32_t IsGearRobotOffset = PatternScan("48 8B 41 68 0F B6 40 3C C3");
+	LogMessage("IsGearRobot:", std::format("{:08x}", IsGearRobotOffset));
+	if (!IsGearRobotOffset) {
+		LogMessage("Shifter display override unavailable: IsGearRobot signature not found or not unique.");
+	}
 	int32_t DisableAutoAndShiftOffset = PatternScan("48 8B 41 68 C6 40 3C 00 E9");//
 	LogMessage("DisableAutoAndShift:", std::format("{:08x}", DisableAutoAndShiftOffset));
 	int32_t SetPowerCoefOffset = PatternScan("48 8B 41 68 F3 0F 11 48 38 C3");//
@@ -144,6 +153,7 @@ void InitMemory() {
 	ShiftToReverseO = (Fnc_ShiftToReverse*)(base + ShiftToReverseOffset);
 	ShiftToNeutralO = (Fnc_ShiftToNeutral*)(base + ShiftToNeutralOffset);
 	GetMaxGearO = (Fnc_GetMaxGear*)(base + GetMaxGearOffset);
+	IsGearRobotO = IsGearRobotOffset ? (Fnc_IsGearRobot*)(base + IsGearRobotOffset) : nullptr;
 	DisableAutoAndShiftO = (Fnc_DisableAutoAndShift*)(base + DisableAutoAndShiftOffset);
 	SetPowerCoefO = (Fnc_SetPowerCoef*)(base + SetPowerCoefOffset);
 	SetCurrentVehicleO = (Fnc_SetCurrentVehicle*)(base + SetCurrentVehicleOffset);
@@ -158,15 +168,16 @@ void InitMemory() {
 	DetourAttach((PVOID*)&ShiftToReverseO, (PVOID)Hooked_ShiftToReverse);
 	DetourAttach((PVOID*)&ShiftToNeutralO, (PVOID)Hooked_ShiftToNeutral);
 	DetourAttach((PVOID*)&GetMaxGearO, (PVOID)Hooked_GetMaxGear);
+	if (IsGearRobotO) {
+		DetourAttach((PVOID*)&IsGearRobotO, (PVOID)Hooked_IsGearRobot);
+	}
 	DetourAttach((PVOID*)&DisableAutoAndShiftO, (PVOID)Hooked_DisableAutoAndShift);
 	DetourAttach((PVOID*)&SetPowerCoefO, (PVOID)Hooked_SetPowerCoef);
 	DetourAttach((PVOID*)&SetCurrentVehicleO, (PVOID)Hooked_SetCurrentVehicle);
 	DetourTransactionCommit();
 
 	if (Vehicle* veh = GetCurrentVehicle()) {
-		IsInAuto[veh] = veh->TruckAction->IsInAutoMode;
-		veh->TruckAction->IsInAutoMode = false;
-		veh->ShiftToGear(1, 1.05);
+		Hooked_SetCurrentVehicle(*TruckControlPtr, veh);
 	}
 
 	LogMessage("init", base);
@@ -181,6 +192,9 @@ void ShutdownMemory() {
 	DetourDetach((PVOID*)&ShiftToReverseO, (PVOID)Hooked_ShiftToReverse);
 	DetourDetach((PVOID*)&ShiftToNeutralO, (PVOID)Hooked_ShiftToNeutral);
 	DetourDetach((PVOID*)&GetMaxGearO, (PVOID)Hooked_GetMaxGear);
+	if (IsGearRobotO) {
+		DetourDetach((PVOID*)&IsGearRobotO, (PVOID)Hooked_IsGearRobot);
+	}
 	DetourDetach((PVOID*)&DisableAutoAndShiftO, (PVOID)Hooked_DisableAutoAndShift);
 	DetourDetach((PVOID*)&SetPowerCoefO, (PVOID)Hooked_SetPowerCoef);
 	DetourDetach((PVOID*)&SetCurrentVehicleO, (PVOID)Hooked_SetCurrentVehicle);

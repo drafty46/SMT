@@ -220,3 +220,4 @@ public:
 };                     // Size: 0x0408
 
 extern std::unordered_map <Vehicle*, std::atomic<bool>> IsInAuto;
+extern void ApplyShiftingOptions();
